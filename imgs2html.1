@@ -93,7 +93,7 @@
 .nr % 0
 .rr F
 .\}
-.TH IMGS2HTML 1 "imgs2html 0.2.2" "9/Oct/2002" "imgs2html"
+.TH IMGS2HTML 1 "imgs2html 0.3.0" "12/Oct/2002" "imgs2html"
 .UC
 .if n .hy 0
 .if n .na
@@ -276,6 +276,21 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 バージョンを表示します。
 .Ip "\fB\-h\fR, \fB--help\fR" 4
 このヘルプを表示します。
+.SH "COMMENT"
+画像ファイルと同じディレクトリに \fI.comment\fR ファイルを置くことで画像
+に対するコメントを付与することができます。\fI.comment\fR ファイルの書式は
+.PP
+.Vb 1
+\&  ファイル名/...コメント...
+.Ve
+です。以下に例を示します。
+.PP
+.Vb 2
+\&  foo.gif/コメント1
+\&  bar.gif/コメント2
+.Ve
+また、ファイル \fI.comment\fR が存在しない場合は、実行時に自動的に作られ
+ます。
 .SH "PREREQUISITES"
 このスクリプトは、画像の処理にImageMagickを利用します。
 また、日本語のコード変換にnkfを利用します。
@@ -355,6 +370,8 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 .IX Item "\fB--version\fR"
 
 .IX Item "\fB\-h\fR, \fB--help\fR"
+
+.IX Header "COMMENT"
 
 .IX Header "PREREQUISITES"
 
