@@ -93,7 +93,7 @@
 .nr % 0
 .rr F
 .\}
-.TH IMGS2HTML 1 "imgs2html 0.2.1" "11/Jul/2002" "imgs2html"
+.TH IMGS2HTML 1 "imgs2html 0.2.2" "9/Oct/2002" "imgs2html"
 .UC
 .if n .hy 0
 .if n .na
@@ -206,6 +206,9 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 .Ip "\fB\-i\fR, \fB--interactive\fR" 4
 対話的に設定事項の指定を行ってから実行できます。
 （デフォルトは対話実行しません）
+.Sp
+なお、対話実行時に設定した値は、 \fI.imgs2html.options\fR ファイルに保存され、
+再度実行した際にはその値が使われるようになります。
 .Ip "\fB\-s\fR, \fB--suffix=\s-1SUFFIX\s0\fR" 4
 対象とする画像の拡張子を指定します。
 （デフォルトは gif です）
