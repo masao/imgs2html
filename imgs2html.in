@@ -257,7 +257,9 @@ sub prompt_yn($$) {
 
 # オプション設定を保存する。: ./.imgs2html.options
 sub save_options() {
-    open(OPTIONS, "> .imgs2html.options") || die "open error: $!";
+    my $savefile = ".imgs2html.options";
+    rename($savefile, "$savefile.bak") || die "error: $!" if -f $savefile;
+    open(OPTIONS, "> $savefile") || die "open error: $savefile: $!";
     print OPTIONS <<EOF;
 \$Suffix = '$Suffix';
 \$ThumbnailRatio = '$ThumbnailRatio';
@@ -350,7 +352,9 @@ sub read_comment() {
 
 sub save_comment(%) {
     my (%comment) = @_;
-    open(COMMENT, ">.comment") || die "error: $!";
+    my $savefile = ".comment";
+    rename($savefile, "$savefile.bak") || die "error: $!" if -f $savefile;
+    open(COMMENT, ">$savefile") || die "error: $!";
     foreach my $key (keys %comment) {
 	print COMMENT "$key/";
 	if (defined $comment{$key}) {
@@ -441,13 +445,17 @@ _EndOfHTML_
 
 	# フッタ
 	print HTML get_navbar_html($page, $lastnum, 1, %htmlfiles);
-	print HTML "<hr width=\"50%\"><p align=\"center\">$comment{$file}</@>\n" if $comment{$file};
+	if ($comment{$file}) {
+	    print HTML "<hr width=\"50%\"><p align=\"center\">$comment{$file}</p>\n";
+	} else {
+	    $comment{$file} = "";
+	}
 	print HTML $HTML_Footer;
 
 	close HTML;
 	$page++;
     }
-    save_comment();
+    save_comment(%comment);
     my $logostr = get_img_tag("$IconDir/$File{'logo'}", $Str{'logo'});
     print INDEXHTML $indexfooter;
     print INDEXHTML "<div align=\"right\">$logostr</div>\n" if $Opt{'logo'};
@@ -679,6 +687,14 @@ B<home>
 このヘルプを表示します。
 
 =back
+
+=head1 COMMENT FEATURE
+
+カレントディレクトリに F<.comment> ファイルを置くことで画像に対するコ
+メントを付与することができます。以下に F<.comment> の例を示します。
+
+  foo.gif/コメント1
+  bar.gif/コメント2
 
 =head1 PREREQUISITES
 
