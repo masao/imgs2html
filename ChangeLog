@@ -1,5 +1,7 @@
 2001-12-10  Masao Takaku  <masao@ulis.ac.jp>
 
+	* NEWS: バージョン 0.0.10 についての記述を追加。
+
 	* imgs2html.in: --reverse オプションを追加した。
 
 2001-11-29  Masao Takaku  <masao@ulis.ac.jp>
