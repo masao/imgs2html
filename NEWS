@@ -1,4 +1,7 @@
-[0.2.0] (2002-03-26)
+[0.2.1] (2002-07-11)
+	* (imgs2html) --htmlonly オプションを追加した。
+
+[0.2.0] (2002-07-10)
 	* (imgs2html) 画像のサイズ判定に ImageMagick の代わりに
 	Image::Size モジュールを使うようにした。
 	* (configure) Image::Size のチェックを追加。

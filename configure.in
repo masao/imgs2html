@@ -5,7 +5,7 @@ dnl $Id$
 dnl
 
 AC_INIT(imgs2html.in)
-AM_INIT_AUTOMAKE(imgs2html, 0.2.0)
+AM_INIT_AUTOMAKE(imgs2html, 0.2.1)
 
 dnl Checks for programs.
 
