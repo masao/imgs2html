@@ -688,13 +688,20 @@ B<home>
 
 =back
 
-=head1 COMMENT FEATURE
+=head1 COMMENT
 
-カレントディレクトリに F<.comment> ファイルを置くことで画像に対するコ
-メントを付与することができます。以下に F<.comment> の例を示します。
+画像ファイルと同じディレクトリに F<.comment> ファイルを置くことで画像
+に対するコメントを付与することができます。F<.comment> ファイルの書式は
+
+  ファイル名/...コメント...
+
+です。以下に例を示します。
 
   foo.gif/コメント1
   bar.gif/コメント2
+
+また、ファイル F<.comment> が存在しない場合は、実行時に自動的に作られ
+ます。
 
 =head1 PREREQUISITES
 
