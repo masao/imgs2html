@@ -425,7 +425,7 @@ _EndOfHTML_
     my $headlaststr = get_img_tag("$IconDir/$File{'last'}", $Str{'last'});
     my $headindexstr = get_img_tag("$IconDir/$File{'index'}", $Str{'index'});
     my $headhomepagestr = get_img_tag("$IconDir/$File{'home'}", $Str{'home'});
-    my $headspacestr = get_img_tag("$IconDir/space.gif", "");
+    my $headspacestr = get_img_tag("$IconDir/space.gif", "　　　　");
 
     # フッダは文字のみ
     my $footfirststr = $Str{'first'};
@@ -434,8 +434,8 @@ _EndOfHTML_
     my $footlaststr = $Str{'last'};
     my $footindexstr = $Str{'index'};
     my $foothomepagestr = $Str{'home'};
-    my $footspacestr = "";
-
+    my $footspacestr = "　　　　";
+    
     my $page = "1";
     my $lastnum = $#files + 1;
     my $firstfile = html_filename($files[0]);
@@ -463,34 +463,6 @@ _EndOfHTML_
 	    if defined($files[$page-2]);
         my $nextfile = html_filename($files[$page]) if defined($files[$page]);
 	
-        my $saisho="";
-        my $modoru="";
-        my $tugi="";
-        my $saigo="";
-	
-	if($page == 1){
-	    # はじめのページ
-	    $saisho=$headfirststr;
-	    $modoru=$headprevstr;
-	    $tugi="<a href=\"$nextfile\">$headnextstr</a>";
-	    $saigo="<a href=\"$lastfile\">$headlaststr</a>";
-	} elsif ($page == $lastnum){
-	    # 最後のページ
-	    $saisho="<a href=\"$firstfile\">$headfirststr</a>";
-	    $modoru="<a href=\"$prevfile\">$headprevstr</a>";
-	    $tugi=$headnextstr;
-	    $saigo=$headlaststr;
-	} else {
-	    # ふつうのページ
-	    $saisho="<a href=\"$firstfile\">$headfirststr</a>";
-	    $modoru="<a href=\"$prevfile\">$headprevstr</a>";
-	    $tugi="<a href=\"$nextfile\">$headnextstr</a>";
-	    $saigo="<a href=\"$lastfile\">$headlaststr</a>";	
-	}
-	my $itiran="<a href=\"index.html\">$headindexstr</a>";
-	my $homepage="<a href=\"$HomepageUrl\">$headhomepagestr</a>";
-	my $space=$headspacestr;
-
 	# ヘッダ
         $HTML_Header =~
 	    s#<title>(.*)</title>#<title>${page}${UnitStr}目</title>#g; 
@@ -498,26 +470,50 @@ _EndOfHTML_
         print HTML "<h1 align=\"center\">${page}${UnitStr}目</h1>\n"
 	    if $Opt{'title'};
         print HTML "<div align=\"center\">\n";
-        print HTML " $saisho \n $modoru \n $tugi \n $saigo \n  $space \n ";
-        print HTML " $itiran \n $homepage\n $space \n";
-	print HTML "$logostr\n" if $Opt{'logo'};
+	if ($page == 1) {
+	    print HTML "  $headfirststr\n";
+	    print HTML "  $headprevstr\n";
+	} else {
+	    print HTML "  <a href=\"$firstfile\">$headfirststr</a>\n";
+	    print HTML "  <a href=\"$prevfile\">$headprevstr</a>\n";
+	}
+	if ($page == $lastnum) {
+	    print HTML "  $headnextstr\n";
+	    print HTML "  $headlaststr\n";
+	} else {
+	    print HTML "  <a href=\"$nextfile\">$headnextstr</a>\n";
+	    print HTML "  <a href=\"$lastfile\">$headlaststr</a>\n";
+	}
+        print HTML "$headspacestr\n";
+	print HTML "<a href=\"index.html\">$headindexstr</a>\n";
+	print HTML "<a href=\"$HomepageUrl\">$headhomepagestr</a>\n";
+	print HTML "$headspacestr\n$logostr\n" if $Opt{'logo'};
 	print HTML "</div>\n";
 	
-	# 画像取り込み
+	# 画像本体
 	$dumpstr = get_img_tag($file, "page $page");
         print HTML "<div align=\"center\">\n$dumpstr\n</div>\n";
 
-	# フッダ
-        $saisho=~ s#$headfirststr#$footfirststr#g;
-        $modoru=~ s#$headprevstr#$footprevstr#g;
-        $tugi=~ s#$headnextstr#$footnextstr#g;
-        $saigo=~ s#$headlaststr#$footlaststr#g;     
-        $itiran=~ s#$headindexstr#$footindexstr#g;	
-        $homepage=~ s#$headhomepagestr#$foothomepagestr#g;
-	$space=~ s#$headspacestr#$footspacestr#g;
-	print HTML "<div align=\"center\">\n";
-	print HTML " $saisho \n $modoru \n $tugi \n $saigo \n  $space \n ";
-        print HTML " $itiran \n $homepage\n $space \n ";
+	# フッタ
+        print HTML "<div align=\"center\">\n";
+	if ($page == 1) {
+	    print HTML "$footfirststr\n";
+	    print HTML "$footprevstr\n";
+	} else {
+	    print HTML "<a href=\"$firstfile\">$footfirststr</a>\n";
+	    print HTML "<a href=\"$prevfile\">$footprevstr</a>";
+	}
+	if ($page == $lastnum) {
+	    print HTML "$footnextstr\n";
+	    print HTML "$footlaststr\n";
+	} else {
+	    print HTML "<a href=\"$nextfile\">$footnextstr</a>";
+	    print HTML "<a href=\"$lastfile\">$footlaststr</a>";
+	}
+	print HTML "$footspacestr\n";
+	print HTML "<a href=\"index.html\">$footindexstr</a>\n";
+	print HTML "<a href=\"$HomepageUrl\">$foothomepagestr</a>\n";
+	print HTML "$spacestr\n$logostr\n" if $Opt{'logo'};
 	print HTML "</div>\n";
 	print HTML $HTML_Footer;
 	
