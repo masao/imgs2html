@@ -106,7 +106,7 @@ sub main {
 	exit 0;
     }
 
-    unless (defined $Opt{'htmlonly'}) {
+    unless ($Opt{'htmlonly'}) {
 	print "一覧用のサムネイル画像を作成します。\n";
 	make_thumbnails(@files);
     }
@@ -192,7 +192,10 @@ sub parse_options() {
 sub getoptions_interactive() {
     print "\n[設定項目]:\n";
     $Suffix = prompt("対象とする画像の拡張子", $Suffix);
-    $ThumbnailRatio = prompt("サムネール画像の縮小率", $ThumbnailRatio);
+    $Opt{'htmlonly'} = not prompt_yn("サムネールを生成する？",
+				     not $Opt{'htmlonly'});
+    $ThumbnailRatio = prompt("サムネール画像の縮小率", $ThumbnailRatio)
+	unless $Opt{'htmlonly'};
     $Opt{'reverse'} = prompt_yn("画像の並び順を逆にする？",
 				$Opt{'reverse'});
     $IconDir = prompt("アイコン画像のあるディレクトリ", $IconDir);
@@ -202,13 +205,12 @@ sub getoptions_interactive() {
     $HomepageUrl = prompt("ホームのURL", $HomepageUrl);
     $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr目）を表示する？",
 			      $Opt{'title'});
-    $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr)
-	if defined $Opt{'title'};
+    $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr) if $Opt{'title'};
     $Opt{'logo'} = prompt_yn("ロゴを表示する？", $Opt{'logo'});
 
     print "\n[ナビゲーションバーの設定]:\n";
     my @navbars = ('first', 'prev', 'next', 'last', 'index', 'home');
-    push @navbars, 'logo' if defined($Opt{'logo'});
+    push @navbars, 'logo' if $Opt{'logo'};
     foreach my $key (@navbars) {
 	$File{$key} = prompt("「$Str{$key}」を示すアイコンのファイル名",
 			     $File{$key})
@@ -218,7 +220,7 @@ sub getoptions_interactive() {
     print "\n";
 
     getoptions_interactive()
-	if !defined(prompt_yn("以上の設定で実行してよろしいですか", 1));
+	if not prompt_yn("以上の設定で実行してよろしいですか", 1);
 
     save_options();
 }
@@ -240,17 +242,14 @@ sub prompt($$) {
 # 設定項目の可否を尋ね、答えを返す。
 sub prompt_yn($$) {
     my ($str, $default) = @_;
-    if (defined($default)) {
-	print "$str (y/n) [yes]: ";
-    } else {
-	print "$str (y/n) [no]: ";
-    }
+    print "$str (y/n) ";
+    print $default ? "[yes]: " : "[no]: ";
     my $input = <>;
     chomp($input);
     if (!length($input)) {
 	return $default;
     } elsif ($input eq "y" || $input eq "yes") {
-	return $input;
+	return 1;
     } else {
 	return undef;
     }
@@ -333,6 +332,34 @@ sub pickup_files() {
     return sort fncmp @files;
 }
 
+sub read_comment() {
+    my %comment = ();
+    if (-r ".comment") {
+	open(COMMENT, ".comment") || die "error: $!";
+	while (my $line = <COMMENT>) {
+	    chomp($line);
+	    if ($line =~ m#^([^/]+)/(.*)$#) {
+		my $fname = $1;
+		my $comment = $2;
+		$comment{$fname} = $comment;
+	    }
+	}
+    }
+    return %comment;
+}
+
+sub save_comment(%) {
+    my (%comment) = @_;
+    open(COMMENT, ">.comment") || die "error: $!";
+    foreach my $key (keys %comment) {
+	print COMMENT "$key/";
+	if (defined $comment{$key}) {
+	    print COMMENT $comment{$key};
+	}
+	print COMMENT "\n";
+    }
+}
+
 sub make_htmlfiles(@) {
     my (@files) = @_;
 
@@ -381,6 +408,8 @@ _EndOfHTML_
     print INDEXHTML "<hr width=\"50%\">\n";
     print INDEXHTML "<div align=\"center\">\n";
 
+    my %comment = read_comment();
+
     foreach my $file (@files) {
 	print "*";
 	my $smallfile = small_filename($file);
@@ -392,7 +421,9 @@ _EndOfHTML_
 	    if defined($files[$page]);
 
 	my $dumpstr = get_img_tag($smallfile, "page $page");
-        print INDEXHTML "<a href=\"$htmlfile\">$dumpstr</a>\n";
+        print INDEXHTML "<a href=\"$htmlfile\"";
+	print INDEXHTML "title=\"$comment{$file}\"" if $comment{$file};
+	print INDEXHTML ">$dumpstr</a>\n";
 
 	open(HTML, "|@NKF@ > $htmlfile") || die "error: $!";
 
@@ -410,11 +441,13 @@ _EndOfHTML_
 
 	# フッタ
 	print HTML get_navbar_html($page, $lastnum, 1, %htmlfiles);
+	print HTML "<hr width=\"50%\"><p align=\"center\">$comment{$file}</@>\n" if $comment{$file};
 	print HTML $HTML_Footer;
 
 	close HTML;
 	$page++;
     }
+    save_comment();
     my $logostr = get_img_tag("$IconDir/$File{'logo'}", $Str{'logo'});
     print INDEXHTML $indexfooter;
     print INDEXHTML "<div align=\"right\">$logostr</div>\n" if $Opt{'logo'};

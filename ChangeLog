@@ -2,6 +2,9 @@
 
 	* imgs2html.in (getoptions_interactive): アイコン・ディレクトリが
 	無い場合はファイル名を尋ねないなどの処理を追加。
+	$Opt{'htmlonly'} について尋ね忘れていたのを修正。
+	(read_comment, save_comment): コメントを付加する機能を追加。
+	defined(not 1) が true になるのを対処。
 
 2002-10-09  Masao Takaku  <masao@ulis.ac.jp>
 
