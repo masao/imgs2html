@@ -21,170 +21,6 @@
 #  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 #
 # This file must be encoded in EUC-JP encoding.
-#
-=pod
-
-=head1 NAME
-
-imgs2html - generate HTML files from images files
-
-=head1 SYNOPSIS
-
-imgs2html [B<--interactive>] [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE]
-[B<--reverse>] [B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
-[B<--icon-I<role>-file>=FILE] [B<--nav-I<role>-str>=STR] [B<--logo>]
-[B<--notitle>] [B<--unit-str>=STR] [B<--version>] [B<--help>]
-
-=head1 DESCRIPTION
-
-imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
-
-このスクリプトを実行するとカレントディレクトリにある画像ファイルを探し、
-それらの一覧と各画像からなるHTMLファイル群を生成します。
-
-生成されるHTMLファイルの文字コードはISO-2022-JPです。
-
-=head1 OPTIONS
-
-以下のオプションを指定できます。
-
-=over 4
-
-=item B<-i>, B<--interactive>
-
-対話的に設定事項の指定を行ってから実行できます。
-（デフォルトは対話実行しません）
-
-=item B<-s>, B<--suffix=SUFFIX>
-
-対象とする画像の拡張子を指定します。
-（デフォルトは gif です）
-
-=item B<-r>, B<--thumbnail-ratio=SIZE>
-
-サムネール画像の元画像からの比率を指定します。
-（デフォルトは 15% です）
-
-=item B<--reverse>
-
-画像をファイル名の逆順に並べます。
-
-=item B<-u>, B<--homepage-url=URL>
-
-ホームのURLを指定します。
-（デフォルトは ../ を指します。）
-
-=item B<--icon-dir=DIR>
-
-ナビゲーション・アイコンのディレクトリ
-（デフォルトは ../image/ です）
-
-=item B<--style=URL>
-
-HTMLファイルで利用するスタイルシートのURLを指定します。
-（デフォルトではスタイルシートは使いません）
-
-=item B<--logo>
-
-ロゴを表示します。
-（デフォルトでは表示しません）
-
-=item B<--notitle>
-
-タイトル（○枚目）を表示しません。
-（デフォルトでは表示します）
-
-=item B<--unit-str>=STR
-
-「〜枚目」の出力を変更します。
-（デフォルトでは"枚"）
-
-=item (ナビゲーションバーの設定)
-
-ナビゲーションバーの部分のアイコンや文字列などを変更するには、以下のオ
-プションが利用できます。
-
-I<role>の部分にはそれぞれ、
-B<first>,
-B<prev>,
-B<next>,
-B<last>,
-B<logo>,
-B<index>,
-B<home>
-のいずれかが入ります。
-
-=over 4
-
-=item B<--icon->I<role>B<-file=FILE>
-
-ナビゲーションバーの各位置のアイコンのファイル名を指定します。
-（ファイルが存在しない場合はアイコンは表示しません）
-
-=item B<--nav->I<role>B<-str=STR>
-
-ナビゲーションバーの各位置の説明文字列を設定します。
-
-デフォルトの設定は以下の通り：
-
-=over 4
-
-=item B<--icon-first-file>	first.gif
-
-=item B<--icon-prev-file>	prev.gif
-
-=item B<--icon-next-file>	next.gif
-
-=item B<--icon-last-file>	last.gif
-
-=item B<--icon-home-file>	home.gif
-
-=item B<--icon-index-file>	info.gif
-
-=item B<--icon-logo-file>	logo.gif
-
-=item B<--nav-first-str>	最初のページ
-
-=item B<--nav-prev-str>		前のページ
-
-=item B<--nav-next-str>		次のページ
-
-=item B<--nav-last-str>		最後のページ
-
-=item B<--nav-home-str>		ホームページ
-
-=item B<--nav-index-str>	一覧
-
-=item B<--nav-logo-str>		ロゴ
-
-=back
-
-=back
-
-=item B<--version>
-
-バージョンを表示します。
-
-=item B<-h>, B<--help>
-
-このヘルプを表示します。
-
-=back
-
-=head1 PREREQUISITES
-
-このスクリプトは、画像の処理にImageMagickを利用します。
-また、日本語のコード変換にnkfを利用します。
-
-=head1 COREQUISITES
-
-B<ps2imgs>スクリプトと一緒に使うと効果的かもしれませんね。
-
-=head1 AUTHOR
-
-高久 雅生 <masao@ulis.ac.jp>, 江草 由佳 <yuka@ulis.ac.jp>
-
-=cut
 
 use Getopt::Long;
 use Pod::Usage;
@@ -251,6 +87,9 @@ $Opt{'title'} = 1;
 # ファイル名のソートを逆順に？
 $Opt{'reverse'} = undef;
 
+# HTML 生成機能のみ（サムネール生成を行わない）
+$Opt{'htmlonly'} = undef;
+
 # スタイルシートのURI
 my $Stylesheet = undef;
 
@@ -267,8 +106,10 @@ sub main {
 	exit 0;
     }
 
-    print "一覧用のサムネイル画像を作成します。\n";
-    make_thumbnails(@files);
+    unless (defined $Opt{'htmlonly'}) {
+	print "一覧用のサムネイル画像を作成します。\n";
+	make_thumbnails(@files);
+    }
 
     print "HTMLファイルを作成します。\n";
     make_htmlfiles(@files);
@@ -319,7 +160,8 @@ sub parse_options() {
 		'unit-str=s'	      => \$UnitStr,
 		'logo!'               => \$Opt{'logo'},
 		'title!'              => \$Opt{'title'},
-		'reverse!'	      => \$Opt{'reverse'}
+		'reverse!'	      => \$Opt{'reverse'},
+		'htmlonly!'	      => \$Opt{'htmlonly'}
 	       ) || pod2usage(-exitval=>1, -verbose=>0);
 
     pod2usage(-exitval => 0, -verbose => 1)
@@ -528,7 +370,7 @@ _EndOfHTML_
     }
     my $logostr = get_img_tag("$IconDir/$File{'logo'}", $Str{'logo'});
     print INDEXHTML $indexfooter;
-    print INDEXHTML "<div align=\"right\">$logostr</div>" if $Opt{'logo'};
+    print INDEXHTML "<div align=\"right\">$logostr</div>\n" if $Opt{'logo'};
     print INDEXHTML $HTML_Footer;
     print " 完了\n";
 }
@@ -600,3 +442,172 @@ sub fncmp {
 	$x cmp $y;
     }
 }
+
+=pod
+
+=head1 NAME
+
+imgs2html - generate HTML files from images files
+
+=head1 SYNOPSIS
+
+imgs2html [B<--interactive>] [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE]
+[B<--reverse>] [B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
+[B<--icon-I<role>-file>=FILE] [B<--nav-I<role>-str>=STR] [B<--logo>]
+[B<--notitle>] [B<--unit-str>=STR] [B<--version>] [B<--help>]
+
+=head1 DESCRIPTION
+
+imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
+
+このスクリプトを実行するとカレントディレクトリにある画像ファイルを探し、
+それらの一覧と各画像からなるHTMLファイル群を生成します。
+
+生成されるHTMLファイルの文字コードはISO-2022-JPです。
+
+=head1 OPTIONS
+
+以下のオプションを指定できます。
+
+=over 4
+
+=item B<-i>, B<--interactive>
+
+対話的に設定事項の指定を行ってから実行できます。
+（デフォルトは対話実行しません）
+
+=item B<-s>, B<--suffix=SUFFIX>
+
+対象とする画像の拡張子を指定します。
+（デフォルトは gif です）
+
+=item B<-r>, B<--thumbnail-ratio=SIZE>
+
+サムネール画像の元画像からの比率を指定します。
+（デフォルトは 15% です）
+
+=item B<--reverse>
+
+画像をファイル名の逆順に並べます。
+
+=item B<-u>, B<--homepage-url=URL>
+
+ホームのURLを指定します。
+（デフォルトは ../ を指します。）
+
+=item B<--icon-dir=DIR>
+
+ナビゲーション・アイコンのディレクトリ
+（デフォルトは ../image/ です）
+
+=item B<--style=URL>
+
+HTMLファイルで利用するスタイルシートのURLを指定します。
+（デフォルトではスタイルシートは使いません）
+
+=item B<--logo>
+
+ロゴを表示します。
+（デフォルトでは表示しません）
+
+=item B<--notitle>
+
+タイトル（○枚目）を表示しません。
+（デフォルトでは表示します）
+
+=item B<--htmlonly>
+
+HTML 出力のみ行い、サムネイルを生成しません。
+（デフォルトではサムネイル生成を常に行います）
+
+=item B<--unit-str>=STR
+
+「〜枚目」の出力を変更します。
+（デフォルトでは"枚"）
+
+=item (ナビゲーションバーの設定)
+
+ナビゲーションバーの部分のアイコンや文字列などを変更するには、以下のオ
+プションが利用できます。
+
+I<role>の部分にはそれぞれ、
+B<first>,
+B<prev>,
+B<next>,
+B<last>,
+B<logo>,
+B<index>,
+B<home>
+のいずれかが入ります。
+
+=over 4
+
+=item B<--icon->I<role>B<-file=FILE>
+
+ナビゲーションバーの各位置のアイコンのファイル名を指定します。
+（ファイルが存在しない場合はアイコンは表示しません）
+
+=item B<--nav->I<role>B<-str=STR>
+
+ナビゲーションバーの各位置の説明文字列を設定します。
+
+デフォルトの設定は以下の通り：
+
+=over 4
+
+=item B<--icon-first-file>	first.gif
+
+=item B<--icon-prev-file>	prev.gif
+
+=item B<--icon-next-file>	next.gif
+
+=item B<--icon-last-file>	last.gif
+
+=item B<--icon-home-file>	home.gif
+
+=item B<--icon-index-file>	info.gif
+
+=item B<--icon-logo-file>	logo.gif
+
+=item B<--nav-first-str>	最初のページ
+
+=item B<--nav-prev-str>		前のページ
+
+=item B<--nav-next-str>		次のページ
+
+=item B<--nav-last-str>		最後のページ
+
+=item B<--nav-home-str>		ホームページ
+
+=item B<--nav-index-str>	一覧
+
+=item B<--nav-logo-str>		ロゴ
+
+=back
+
+=back
+
+=item B<--version>
+
+バージョンを表示します。
+
+=item B<-h>, B<--help>
+
+このヘルプを表示します。
+
+=back
+
+=head1 PREREQUISITES
+
+このスクリプトは、画像の処理にImageMagickを利用します。
+また、日本語のコード変換にnkfを利用します。
+
+=head1 COREQUISITES
+
+B<ps2imgs>スクリプトと一緒に使うと効果的かもしれませんね。
+
+=head1 AUTHOR
+
+高久 雅生 <masao@ulis.ac.jp>, 江草 由佳 <yuka@ulis.ac.jp>
+
+=cut
