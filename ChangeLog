@@ -1,3 +1,8 @@
+2002-10-12  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (getoptions_interactive): アイコン・ディレクトリが
+	無い場合はファイル名を尋ねないなどの処理を追加。
+
 2002-10-09  Masao Takaku  <masao@ulis.ac.jp>
 
 	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.2.2 に上げた。

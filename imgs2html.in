@@ -193,27 +193,32 @@ sub getoptions_interactive() {
     print "\n[設定項目]:\n";
     $Suffix = prompt("対象とする画像の拡張子", $Suffix);
     $ThumbnailRatio = prompt("サムネール画像の縮小率", $ThumbnailRatio);
-    $Opt{'reverse'} = prompt_yn("画像の並び順を逆にするかどうか", $Opt{'reverse'});
+    $Opt{'reverse'} = prompt_yn("画像の並び順を逆にする？",
+				$Opt{'reverse'});
     $IconDir = prompt("アイコン画像のあるディレクトリ", $IconDir);
     print "\t警告: $IconDir は存在しません。画像アイコンの指定は無視されます。\n"
 	unless -d $IconDir;
     $Stylesheet = prompt("スタイルシート（CSS）のURL", $Stylesheet);
     $HomepageUrl = prompt("ホームのURL", $HomepageUrl);
-    $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr);
-    $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr目）を表示するかどうか", $Opt{'title'});
-    $Opt{'logo'} = prompt_yn("ロゴを表示するかどうか", $Opt{'logo'});
+    $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr目）を表示する？",
+			      $Opt{'title'});
+    $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr)
+	if defined $Opt{'title'};
+    $Opt{'logo'} = prompt_yn("ロゴを表示する？", $Opt{'logo'});
 
     print "\n[ナビゲーションバーの設定]:\n";
     my @navbars = ('first', 'prev', 'next', 'last', 'index', 'home');
     push @navbars, 'logo' if defined($Opt{'logo'});
     foreach my $key (@navbars) {
-	$File{$key} = prompt("「$Str{$key}」を示すアイコンのファイル名", $File{$key});
+	$File{$key} = prompt("「$Str{$key}」を示すアイコンのファイル名",
+			     $File{$key})
+	    if -d $IconDir;
 	$Str{$key} = prompt("「$Str{$key}」を示す文字列", $Str{$key});
     }
     print "\n";
 
     getoptions_interactive()
-	if !defined(prompt_yn("以上の設定で実行してよろしいですか"));
+	if !defined(prompt_yn("以上の設定で実行してよろしいですか", 1));
 
     save_options();
 }
