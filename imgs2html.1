@@ -93,7 +93,7 @@
 .nr % 0
 .rr F
 .\}
-.TH IMGS2HTML 1 "imgs2html 0.0.10" "10/Dec/2001" "imgs2html"
+.TH IMGS2HTML 1 "imgs2html 0.1.0" "26/Mar/2002" "imgs2html"
 .UC
 .if n .hy 0
 .if n .na
@@ -190,10 +190,10 @@
 .SH "NAME"
 imgs2html \- generate HTML files from images files
 .SH "SYNOPSIS"
-imgs2html [\fB--suffix\fR=SUFFIX] [\fB--thumbnail-ratio\fR=SIZE]
-[\fB--homepage-url\fR=URL] [\fB--icon-dir\fR=DIR] [\fB--style\fR=URL]
+imgs2html [\fB--interactive\fR] [\fB--suffix\fR=SUFFIX] [\fB--thumbnail-ratio\fR=SIZE]
+[\fB--reverse\fR] [\fB--homepage-url\fR=URL] [\fB--icon-dir\fR=DIR] [\fB--style\fR=URL]
 [\fB--icon-\fIrole\fR\-file\fR=FILE] [\fB--nav-\fIrole\fR\-str\fR=STR] [\fB--logo\fR]
-[\fB--notitle\fR] [\fB--version\fR] [\fB--help\fR]
+[\fB--notitle\fR] [\fB--unit-str\fR=STR] [\fB--version\fR] [\fB--help\fR]
 .SH "DESCRIPTION"
 imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 .PP
@@ -203,12 +203,17 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 生成されるHTMLファイルの文字コードはISO\-2022-JPです。
 .SH "OPTIONS"
 以下のオプションを指定できます。
+.Ip "\fB\-i\fR, \fB--interactive\fR" 4
+対話的に設定事項の指定を行ってから実行できます。
+（デフォルトは対話実行しません）
 .Ip "\fB\-s\fR, \fB--suffix=\s-1SUFFIX\s0\fR" 4
 対象とする画像の拡張子を指定します。
 （デフォルトは gif です）
 .Ip "\fB\-r\fR, \fB--thumbnail-ratio=\s-1SIZE\s0\fR" 4
 サムネール画像の元画像からの比率を指定します。
 （デフォルトは 15% です）
+.Ip "\fB--reverse\fR" 4
+画像をファイル名の逆順に並べます。
 .Ip "\fB\-u\fR, \fB--homepage-url=\s-1URL\s0\fR" 4
 ホームの\s-1URL\s0を指定します。
 （デフォルトは ../ を指します。）
@@ -224,18 +229,19 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 .Ip "\fB--notitle\fR" 4
 タイトル（○枚目）を表示しません。
 （デフォルトでは表示します）
-.Ip "\fB--reverse\fR" 4
-画像をファイル名の逆順に並べます。
+.Ip "\fB--unit-str\fR=\s-1UNIT\s0" 4
+「〜枚目」の出力を変更します。
+（デフォルトでは"枚"）
 .Ip "(ナビゲーションバーの設定)" 4
 ナビゲーションバーの部分のアイコンや文字列などを変更するには、以下のオ
 プションが利用できます。
 .Sp
 \fIrole\fRの部分にはそれぞれ、
 \fBfirst\fR,
-\fBprev\fR, 
+\fBprev\fR,
 \fBnext\fR,
 \fBlast\fR,
-\fBlogo\fR, 
+\fBlogo\fR,
 \fBindex\fR,
 \fBhome\fR
 のいずれかが入ります。
@@ -284,9 +290,13 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 
 .IX Header "OPTIONS"
 
+.IX Item "\fB\-i\fR, \fB--interactive\fR"
+
 .IX Item "\fB\-s\fR, \fB--suffix=\s-1SUFFIX\s0\fR"
 
 .IX Item "\fB\-r\fR, \fB--thumbnail-ratio=\s-1SIZE\s0\fR"
+
+.IX Item "\fB--reverse\fR"
 
 .IX Item "\fB\-u\fR, \fB--homepage-url=\s-1URL\s0\fR"
 
@@ -298,7 +308,7 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 
 .IX Item "\fB--notitle\fR"
 
-.IX Item "\fB--reverse\fR"
+.IX Item "\fB--unit-str\fR=\s-1UNIT\s0"
 
 .IX Item "(ナビゲーションバーの設定)"
 

@@ -1,3 +1,7 @@
+[0.1.0] (2002-03-26)
+	* (imgs2html) --interactive オプションを追加した。
+	* (imgs2html) --unit-str オプションを追加した。
+
 [0.0.10] (2001-12-10)
 	* (imgs2html) --reverse オプションを追加した。
 

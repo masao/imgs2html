@@ -1,5 +1,11 @@
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.1.0 に上げた。
+
+	* NEWS: バージョン 0.1.0 についての記述を追加。
+
+	* imgs2html.in: PODをちょっと修正。
+
 	* TODO: 対話実行の記述を削除。
 
 	* imgs2html.in: --interactive オプションを追加。
