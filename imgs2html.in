@@ -340,7 +340,7 @@ sub read_comment() {
 	open(COMMENT, ".comment") || die "error: $!";
 	while (my $line = <COMMENT>) {
 	    chomp($line);
-	    if ($line =~ m#^([^/]+)/(.*)$#) {
+	    if ($line =~ m#^([^\t]+)\t(.*)$#) {
 		my $fname = $1;
 		my $comment = $2;
 		$comment{$fname} = $comment;
@@ -356,10 +356,8 @@ sub save_comment(%) {
     rename($savefile, "$savefile.bak") || die "error: $!" if -f $savefile;
     open(COMMENT, ">$savefile") || die "error: $!";
     foreach my $key (sort fncmp keys %comment) {
-	print COMMENT "$key/";
-	if (defined $comment{$key}) {
-	    print COMMENT $comment{$key};
-	}
+	print COMMENT "$key\t";
+	print COMMENT $comment{$key} if defined $comment{$key};
 	print COMMENT "\n";
     }
 }
@@ -693,12 +691,13 @@ B<home>
 画像ファイルと同じディレクトリに F<.comment> ファイルを置くことで画像
 に対するコメントを付与することができます。F<.comment> ファイルの書式は
 
-  ファイル名/...コメント...
+  ファイル名	...コメント...
 
-です。以下に例を示します。
+となり、ファイル名とコメントの間はタブ（"\t"）で区切られます。以下に例を
+示します。
 
-  foo.gif/コメント1
-  bar.gif/コメント2
+  foo.gif	コメント1
+  bar.gif	コメント2
 
 また、ファイル F<.comment> が存在しない場合は、実行時に自動的に作られ
 ます。
