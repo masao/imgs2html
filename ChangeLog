@@ -1,5 +1,7 @@
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
+	* TODO: 対話実行の記述を削除。
+
 	* imgs2html.in: --interactive オプションを追加。
 
 	* TODO: 出力/入力ディレクトリの指定についての記述を追加。
