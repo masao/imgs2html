@@ -93,7 +93,7 @@
 .nr % 0
 .rr F
 .\}
-.TH IMGS2HTML 1 "imgs2html 0.3.0" "12/Oct/2002" "imgs2html"
+.TH IMGS2HTML 1 "imgs2html 0.3.1" "17/Oct/2002" "imgs2html"
 .UC
 .if n .hy 0
 .if n .na
@@ -281,13 +281,14 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 に対するコメントを付与することができます。\fI.comment\fR ファイルの書式は
 .PP
 .Vb 1
-\&  ファイル名/...コメント...
+\&  ファイル名    ...コメント...
 .Ve
-です。以下に例を示します。
+となり、ファイル名とコメントの間はタブ（\*(R"\et"）で区切られます。以下に例を
+示します。
 .PP
 .Vb 2
-\&  foo.gif/コメント1
-\&  bar.gif/コメント2
+\&  foo.gif       コメント1
+\&  bar.gif       コメント2
 .Ve
 また、ファイル \fI.comment\fR が存在しない場合は、実行時に自動的に作られ
 ます。
