@@ -1,3 +1,8 @@
+2001-08-04  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in: --title オプションがデフォルトで無効になっていたの
+	を修正。
+
 Wed Dec 27 22:06:22 2000  Masao Takaku  <masao@ulis.ac.jp>
 
 	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.9 に上げた。

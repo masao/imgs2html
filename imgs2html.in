@@ -229,7 +229,7 @@ my %Opt = ();
 $Opt{'logo'} = undef;
 
 # タイトルを表示するか？
-$Opt{'title'} = undef;
+$Opt{'title'} = 1;
 
 # スタイルシートのURI
 my $Stylesheet = undef;
