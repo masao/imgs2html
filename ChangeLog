@@ -1,3 +1,8 @@
+2003-01-13  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (make_thumbnails): サムネール生成時に Exif などの余
+	計なヘッダ類を削除するようにした。
+
 2002-11-12  Masao Takaku  <masao@ulis.ac.jp>
 
 	* ps2imgs.in: pod の <, > をエスケープするよう修正した。
