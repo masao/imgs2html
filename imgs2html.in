@@ -587,12 +587,12 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 =item B<-u>, B<--homepage-url=URL>
 
 ホームのURLを指定します。
-（デフォルトは ../ を指します。）
+（デフォルトは F<../> を指します。）
 
 =item B<--icon-dir=DIR>
 
 ナビゲーション・アイコンのディレクトリ
-（デフォルトは ../image/ です）
+（デフォルトは F<../image/> です）
 
 =item B<--style=URL>
 
@@ -609,7 +609,7 @@ HTMLファイルで利用するスタイルシートのURLを指定します。
 タイトル（○枚目）を表示しません。
 （デフォルトでは表示します）
 
-指定された場合、<title> 要素には画像ファイル名が入ります。
+指定された場合、C<E<lt>titleE<gt>> 要素には画像ファイル名が入ります。
 
 =item B<--htmlonly>
 
@@ -720,6 +720,6 @@ B<ps2imgs>スクリプトと一緒に使うと効果的かもしれませんね。
 
 =head1 AUTHOR
 
-高久 雅生 <masao@ulis.ac.jp>, 江草 由佳 <yuka@ulis.ac.jp>
+高久 雅生 E<lt>masao@ulis.ac.jpE<gt>, 江草 由佳 E<lt>yuka@ulis.ac.jpE<gt>
 
 =cut
