@@ -1,5 +1,7 @@
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
+	* TODO: 出力/入力ディレクトリの指定に
+
 	* imgs2html.in: --unit-str オプションを追加した。
 	--reverse オプションの記述を追加した。
 
