@@ -1,3 +1,7 @@
+2002-03-09  Masao Takaku  <masao@ulis.ac.jp>
+
+	* BUGS: EPS に未対応の旨、追加。
+
 2001-12-15  Masao Takaku  <masao@ulis.ac.jp>
 
 	* TODO: img要素のtitle属性の扱いについての記述を追加。
