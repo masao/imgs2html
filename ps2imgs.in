@@ -34,11 +34,12 @@ ps2imgs [B<--help>] [B<--format>=FORMAT] file.ps ...
 
 =head1 DESCRIPTION
 
-ps2imgs は、PostScriptファイルを画像ファイルに変換します。
+ps2imgs は、PostScript ファイルを画像ファイルに変換します。
 
-生成する画像のファイル名は、PostScriptファイルの拡張子を除いた部分＋3
-桁の連番が自動的にふられます。例えば、ex.psというファイルを変換すると、
-ex001.gif, ex002.gif, ...のようなファイルが生成されます。
+生成する画像のファイル名は、PostScript ファイルの拡張子を除いた部分＋
+３桁の連番が自動的にふられます。例えば、ex.ps というファイルを変換する
+と、 ex001.gif, ex002.gif, ... のようなファイルが生成されます。
+
 
 =head1 OPTIONS
 
