@@ -1,5 +1,7 @@
 2003-01-13  Masao Takaku  <masao@ulis.ac.jp>
 
+	* NEWS: バージョン 0.3.3 についての記述を追加。
+
 	* imgs2html.in (make_thumbnails): サムネール生成時に Exif などの余
 	計なヘッダ類を削除するようにした。
 
@@ -10,6 +12,10 @@
 	* imgs2html.in: 同上。
 
 2002-10-24  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.3.2 に上げた。
+
+	* NEWS: バージョン 0.3.2 についての記述を追加。
 
 	* imgs2html.in (make_htmlfiles): title 属性の使い方が不正だったの
 	を修正。
