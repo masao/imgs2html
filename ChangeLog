@@ -1,5 +1,7 @@
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
+	* imgs2html.in: --interactive オプションを追加。
+
 	* TODO: 出力/入力ディレクトリの指定についての記述を追加。
 
 	* imgs2html.in: --unit-str オプションを追加した。

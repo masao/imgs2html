@@ -30,8 +30,8 @@ imgs2html - generate HTML files from images files
 
 =head1 SYNOPSIS
 
-imgs2html [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE] [B<--reverse>]
-[B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
+imgs2html [B<--interactive>] [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE]
+[B<--reverse>] [B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
 [B<--icon-I<role>-file>=FILE] [B<--nav-I<role>-str>=STR] [B<--logo>]
 [B<--notitle>] [B<--unit-str>=STR] [B<--version>] [B<--help>]
 
@@ -49,6 +49,11 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 以下のオプションを指定できます。
 
 =over 4
+
+=item B<-i>, B<--interactive>
+
+対話的に設定事項の指定を行ってから実行できます。
+（デフォルトは対話実行しません）
 
 =item B<-s>, B<--suffix=SUFFIX>
 
@@ -101,10 +106,10 @@ HTMLファイルで利用するスタイルシートのURLを指定します。
 
 I<role>の部分にはそれぞれ、
 B<first>,
-B<prev>, 
+B<prev>,
 B<next>,
 B<last>,
-B<logo>, 
+B<logo>,
 B<index>,
 B<home>
 のいずれかが入ります。
@@ -297,11 +302,13 @@ sub parse_options()
 {
     my $opt_help = undef;
     my $opt_version = undef;
+    my $opt_interactive = undef;
 
     Getopt::Long::config('bundling');
     GetOptions ('h|help'              => \$opt_help,
 		'd|debug'             => \$DEBUG,
 		'version'	      => \$opt_version,
+		'i|interactive'	      => \$opt_interactive,
 		's|suffix=s'          => \$Suffix,
 		'r|thumbnail-ratio=s' => \$ThumbnailRatio,
 		'u|homepage-url=s'    => \$HomepageUrl,
@@ -335,6 +342,10 @@ sub parse_options()
 	exit 0;
     }
 
+    if ($opt_interactive) {
+	getoptions_interactive();
+    }
+
     if (@ARGV != 0) {
 	print "以下の引数は無効です: @ARGV\n";
     }
@@ -347,9 +358,67 @@ sub parse_options()
     }
 }
 
+sub getoptions_interactive() {
+    print "\n[設定項目]:\n";
+    $Suffix = prompt("対象とする画像の拡張子", $Suffix);
+    $ThumbnailRatio = prompt("サムネール画像の縮小率", $ThumbnailRatio);
+    $Opt{'reverse'} = prompt_yn("画像の並び順を逆にするかどうか", $Opt{'reverse'});
+    $IconDir = prompt("アイコン画像のあるディレクトリ", $IconDir);
+		      # "画像ファイルが存在しない場合はテキスト表示します");
+    $Stylesheet = prompt("スタイルシート（CSS）のURL", $Stylesheet);
+    $HomepageUrl = prompt("ホームのURL", $HomepageUrl);
+    $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr);
+    $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr目）を表示するかどうか", $Opt{'title'});
+    $Opt{'logo'} = prompt_yn("ロゴを表示するかどうか", $Opt{'logo'});
+
+    print "\n[ナビゲーションバーの設定]:\n";
+    my @navbars = ('first', 'prev', 'next', 'last', 'index', 'home');
+    push @navbars, 'logo' if defined($Opt{'logo'});
+    foreach my $key (@navbars) {
+	$File{$key} = prompt("「$Str{$key}」を示すアイコンのファイル名", $File{$key});
+	$Str{$key} = prompt("「$Str{$key}」を示す文字列", $Str{$key});
+    }
+    print "\n";
+
+    getoptions_interactive()
+	if !defined(prompt_yn("以上の設定で実行してよろしいですか"));
+}
+
+# 設定項目を尋ね、答えを返す。
+sub prompt($$) {
+    my ($str, $default) = @_;
+    my $default_str = $default || '';
+    print "$str [$default_str]: ";
+    my $input = <>;
+    chomp($input);
+    if (!length($input)) {
+	return $default;
+    } else {
+	return $input;
+    }
+}
+
+# 設定項目の可否を尋ね、答えを返す。
+sub prompt_yn($$) {
+    my ($str, $default) = @_;
+    if (defined($default)) {
+	print "$str (y/n) [yes]: ";
+    } else {
+	print "$str (y/n) [no]: ";
+    }
+    my $input = <>;
+    chomp($input);
+    if (!length($input)) {
+	return $default;
+    } elsif ($input eq "y" || $input eq "yes") {
+	return $input;
+    } else {
+	return undef;
+    }
+}
+
 # サムネイル画像をつくる。
-sub make_thumbnails(@)
-{
+sub make_thumbnails(@) {
     my (@files) = @_;
     my $percentage = $ThumbnailRatio ."x". $ThumbnailRatio;
     foreach my $file (@files) {
@@ -361,15 +430,13 @@ sub make_thumbnails(@)
     print " 完了\n";
 }
 
-sub small_filename($)
-{
+sub small_filename($) {
     my ($filename) = @_;
     my $small_filename = $filename;
     $small_filename =~ s/(.*)\.$Suffix$/$1small\.$Suffix/;
     return $small_filename;
 }
-sub html_filename($)
-{
+sub html_filename($) {
     my ($filename) = @_;
     my $html_filename = $filename;
     $html_filename =~ s/(.*)\.$Suffix/$1\.html/;
@@ -377,8 +444,7 @@ sub html_filename($)
 }
 
 # 対象となるファイルを探索し、ファイル名でソートしたリストを返す。
-sub pickup_files()
-{
+sub pickup_files() {
     opendir(DIR, ".") || die "読めません: $!";
     my @files = grep { -f && /\.$Suffix$/ } readdir(DIR);
 
