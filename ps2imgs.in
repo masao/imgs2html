@@ -1,5 +1,5 @@
 #!@PERL@ -w
-# -*- Perl -*-
+# -*- CPerl -*-
 #
 # ps2imgs : PostScript ファイルを 画像ファイルに変換します。
 # $Id$

@@ -1,8 +1,13 @@
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
-	* imgs2html.in: HTML 出力ルーチンを整理した。
+	* imgs2html.in: --unit-str オプションを追加した。
+	--reverse オプションの記述を追加した。
+
+	* ps2imgs.in, imgs2html.in: cperl-mode.
+
+	* imgs2html.in (make_htmlfiles): HTML 出力ルーチンを整理した。
 	全角空白の出力を元に戻した。（[2001-12-15]の変更分）
-	ナビゲーションバー出力ルーチンを整理した。
+	(get_navbar_html): ナビゲーションバー出力ルーチンを整理した。
 
 2002-03-09  Masao Takaku  <masao@ulis.ac.jp>
 

@@ -1,5 +1,5 @@
 #!@PERL@ -w
-# -*-Perl-*-
+# -*-CPerl-*-
 #
 # imgs2html : 複数の画像ファイルを元にHTMLファイルを自動的に作成します。
 # $Id$
@@ -30,10 +30,10 @@ imgs2html - generate HTML files from images files
 
 =head1 SYNOPSIS
 
-imgs2html [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE]
+imgs2html [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE] [B<--reverse>]
 [B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
 [B<--icon-I<role>-file>=FILE] [B<--nav-I<role>-str>=STR] [B<--logo>]
-[B<--notitle>] [B<--version>] [B<--help>]
+[B<--notitle>] [B<--unit-str>=STR] [B<--version>] [B<--help>]
 
 =head1 DESCRIPTION
 
@@ -60,6 +60,10 @@ imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
 サムネール画像の元画像からの比率を指定します。
 （デフォルトは 15% です）
 
+=item B<--reverse>
+
+画像をファイル名の逆順に並べます。
+
 =item B<-u>, B<--homepage-url=URL>
 
 ホームのURLを指定します。
@@ -85,9 +89,10 @@ HTMLファイルで利用するスタイルシートのURLを指定します。
 タイトル（○枚目）を表示しません。
 （デフォルトでは表示します）
 
-=item B<--reverse>
+=item B<--unit-str>=UNIT
 
-画像をファイル名の逆順に並べます。
+「〜枚目」の出力を変更します。
+（デフォルトでは"枚"）
 
 =item (ナビゲーションバーの設定)
 
@@ -195,13 +200,13 @@ my $HomepageUrl = "../";
 $HomepageUrl = "/~$ENV{'USER'}/" if defined $ENV{'USER'};
 $HomepageUrl = $ENV{'WWW_HOME'} if defined $ENV{'WWW_HOME'};
 
-# 対象となる画像ファイルの拡張子: -s オプションで指定可能。
+# 対象となる画像ファイルの拡張子: （-s オプション）
 my $Suffix = "gif";
 
-# アイコンファイルの入っているディレクトリ
+# アイコンファイルの入っているディレクトリ: （--icon-dir オプション）
 my $IconDir = "../image";
 
-# ページ or スライド ？
+# ページ or スライド？: （--unit-str オプション）
 my $UnitStr="枚";
 
 # サムネールのサイズ（オリジナルの画像に対するパーセンテージ）
@@ -258,7 +263,7 @@ sub main {
 
     print "一覧用のサムネイル画像を作成します。\n";
     make_thumbnails(@files);
-    
+
     print "HTMLファイルを作成します。\n";
     make_htmlfiles(@files);
     print "カレントディレクトリにHTMLファイルを作成しました。\n"
@@ -270,10 +275,10 @@ sub get_img_tag($$)
     my ($imagefile, $altstr) = @_;
 
     return $altstr if ! -f $imagefile;
-    
+
     my $imagewidth ="";
     my $imageheight ="";
-    
+
     open(ID, "@IDENTIFY@ $imagefile|") || die "identifyが実行できませんでした。:$!";
     my $id = <ID>;
     if ($id =~ /^$imagefile (\d+)x(\d+)/) {
@@ -283,7 +288,7 @@ sub get_img_tag($$)
     close(ID) || die "identifyが実行できませんでした。:$!";
 
     my $imagetagstr = "<img src=\"$imagefile\" alt=\"$altstr\" width=\"$imagewidth\" height=\"$imageheight\">";
-	
+
     return $imagetagstr;
 }
 
@@ -292,7 +297,7 @@ sub parse_options()
 {
     my $opt_help = undef;
     my $opt_version = undef;
-    
+
     Getopt::Long::config('bundling');
     GetOptions ('h|help'              => \$opt_help,
 		'd|debug'             => \$DEBUG,
@@ -316,23 +321,24 @@ sub parse_options()
 		'nav-index-str=s'     => \$Str{'index'},
 		'nav-home-str=s'      => \$Str{'home'},
 		'nav-logo-str=s'      => \$Str{'logo'},
+		'unit-str=s'	      => \$UnitStr,
 		'logo!'               => \$Opt{'logo'},
 		'title!'              => \$Opt{'title'},
 		'reverse!'	      => \$Opt{'reverse'}
-		) || pod2usage(-exitval=>1, -verbose=>0);
+	       ) || pod2usage(-exitval=>1, -verbose=>0);
 
     pod2usage(-exitval => 0, -verbose => 1)
 	if ($opt_help);
-    
+
     if ($opt_version) {
 	print "imgs2html $VERSION\n";
 	exit 0;
     }
-    
+
     if (@ARGV != 0) {
 	print "以下の引数は無効です: @ARGV\n";
     }
-    
+
     if ($DEBUG) {
 	print "オプションの設定は以下の通りです。";
 	foreach my $key (keys %Opt) {
