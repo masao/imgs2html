@@ -316,6 +316,7 @@ sub parse_options()
     
     if ($opt_version) {
 	print "imgs2html $VERSION\n";
+	exit 0;
     }
     
     if (@ARGV != 0) {
