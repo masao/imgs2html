@@ -1,5 +1,7 @@
 2001-09-22  Masao Takaku  <masao@ulis.ac.jp>
 
+	* configure.in: バージョンを 0.0.10 に上げた。
+
 	* NEWS: バージョン 0.0.9 についての記述を追加。
 
 2001-08-04  Masao Takaku  <masao@ulis.ac.jp>
