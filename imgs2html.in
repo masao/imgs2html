@@ -85,6 +85,10 @@ HTMLファイルで利用するスタイルシートのURLを指定します。
 タイトル（○枚目）を表示しません。
 （デフォルトでは表示します）
 
+=item B<--reverse>
+
+画像をファイル名の逆順に並べます。
+
 =item (ナビゲーションバーの設定)
 
 ナビゲーションバーの部分のアイコンや文字列などを変更するには、以下のオ
@@ -231,6 +235,9 @@ $Opt{'logo'} = undef;
 # タイトルを表示するか？
 $Opt{'title'} = 1;
 
+# ファイル名のソートを逆順に？
+$Opt{'reverse'} = undef;
+
 # スタイルシートのURI
 my $Stylesheet = undef;
 
@@ -308,7 +315,8 @@ sub parse_options()
 		'nav-home-str=s'      => \$Str{'home'},
 		'nav-logo-str=s'      => \$Str{'logo'},
 		'logo!'               => \$Opt{'logo'},
-		'title!'              => \$Opt{'title'}
+		'title!'              => \$Opt{'title'},
+		'reverse!'	      => \$Opt{'reverse'}
 		) || pod2usage(-exitval=>1, -verbose=>0);
 
     pod2usage(-exitval => 0, -verbose => 1)
@@ -538,5 +546,10 @@ sub fncmp {
 
     $x =~ s/(\d+)/sprintf("%08d", $1)/ge;
     $y =~ s/(\d+)/sprintf("%08d", $1)/ge;
-    $x cmp $y;
+
+    if (defined($Opt{'reverse'})) {
+	$y cmp $x;
+    } else {
+	$x cmp $y;
+    }
 }
