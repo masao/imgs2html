@@ -276,8 +276,7 @@ sub main {
 }
 
 # 画像のタグ入り文字列作成  引数 ファイル名 と alt 文字列
-sub get_img_tag($$)
-{
+sub get_img_tag($$) {
     my ($imagefile, $altstr) = @_;
 
     return $altstr if ! -f $imagefile;
@@ -288,8 +287,7 @@ sub get_img_tag($$)
 }
 
 # オプションを解析する。
-sub parse_options()
-{
+sub parse_options() {
     my $opt_help = undef;
     my $opt_version = undef;
     my $opt_interactive = undef;
@@ -426,6 +424,7 @@ sub small_filename($) {
     $small_filename =~ s/(.*)\.$Suffix$/$1small\.$Suffix/;
     return $small_filename;
 }
+
 sub html_filename($) {
     my ($filename) = @_;
     my $html_filename = $filename;
