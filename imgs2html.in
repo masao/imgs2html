@@ -424,14 +424,19 @@ _EndOfHTML_
 
 	my $dumpstr = get_img_tag($smallfile, "page $page");
         print INDEXHTML "<a href=\"$htmlfile\"";
-	print INDEXHTML "title=\"$comment{$file}\"" if $comment{$file};
+	print INDEXHTML " title=\"$comment{$file}\"" if $comment{$file};
 	print INDEXHTML ">$dumpstr</a>\n";
 
 	open(HTML, "|@NKF@ > $htmlfile") || die "error: $!";
 
 	# ヘッダ
-        $HTML_Header =~
-	    s#<title>(.*)</title>#<title>${page}${UnitStr}目</title>#g;
+	my $title = "${page}${UnitStr}目";
+	if (not $Opt{'title'}) {
+	    $title = $file;
+	    $title .= ": $comment{$file}" if $comment{$file};
+	}
+	$HTML_Header =~
+	    s#<title>(.*)</title>#<title>$title</title>#g;
         print HTML $HTML_Header;
         print HTML "<h1 align=\"center\">${page}${UnitStr}目</h1>\n"
 	    if $Opt{'title'};

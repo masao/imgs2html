@@ -1,3 +1,11 @@
+2002-10-24  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (make_htmlfiles): title 属性の使い方が不正だったの
+	を修正。
+
+	* imgs2html.in (make_htmlfiles): --notitle 指定時には、HTML の
+	<title>...</title> も「〜枚目」をやめ、ファイル名を出すように変更。
+
 2002-10-17  Masao Takaku  <masao@ulis.ac.jp>
 
 	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.3.1 に上げた。
