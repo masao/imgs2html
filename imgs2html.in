@@ -54,6 +54,9 @@ my $UnitStr="枚";
 # サムネールのサイズ（オリジナルの画像に対するパーセンテージ）
 my $ThumbnailRatio = "15%";
 
+# スタイルシートのURI
+my $Stylesheet = '';
+
 # ナビゲーションバーで使うファイルとアンカー。(オプション設定可)
 my %File = ();
 $File{'first'} = "first.gif";
@@ -89,9 +92,6 @@ $Opt{'reverse'} = undef;
 
 # HTML 生成機能のみ（サムネール生成を行わない）
 $Opt{'htmlonly'} = undef;
-
-# スタイルシートのURI
-my $Stylesheet = undef;
 
 main();
 sub main {
@@ -173,11 +173,12 @@ sub parse_options() {
     }
 
     if ($opt_interactive) {
+	read_options();
 	getoptions_interactive();
     }
 
     if (@ARGV != 0) {
-	print "以下の引数は無効です: @ARGV\n";
+	print "\t警告: 以下の引数は無効です: @ARGV\n";
     }
 
     if ($DEBUG) {
@@ -194,7 +195,8 @@ sub getoptions_interactive() {
     $ThumbnailRatio = prompt("サムネール画像の縮小率", $ThumbnailRatio);
     $Opt{'reverse'} = prompt_yn("画像の並び順を逆にするかどうか", $Opt{'reverse'});
     $IconDir = prompt("アイコン画像のあるディレクトリ", $IconDir);
-		      # "画像ファイルが存在しない場合はテキスト表示します");
+    print "\t警告: $IconDir は存在しません。画像アイコンの指定は無視されます。\n"
+	unless -d $IconDir;
     $Stylesheet = prompt("スタイルシート（CSS）のURL", $Stylesheet);
     $HomepageUrl = prompt("ホームのURL", $HomepageUrl);
     $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr);
@@ -212,6 +214,8 @@ sub getoptions_interactive() {
 
     getoptions_interactive()
 	if !defined(prompt_yn("以上の設定で実行してよろしいですか"));
+
+    save_options();
 }
 
 # 設定項目を尋ね、答えを返す。
@@ -245,6 +249,44 @@ sub prompt_yn($$) {
     } else {
 	return undef;
     }
+}
+
+# オプション設定を保存する。: ./.imgs2html.options
+sub save_options() {
+    open(OPTIONS, "> .imgs2html.options") || die "open error: $!";
+    print OPTIONS <<EOF;
+\$Suffix = '$Suffix';
+\$ThumbnailRatio = '$ThumbnailRatio';
+\$IconDir = '$IconDir';
+\$Stylesheet = '$Stylesheet';
+\$HomepageUrl = '$HomepageUrl';
+\$UnitStr = '$UnitStr';
+EOF
+    foreach my $key (keys %Opt) {
+	print OPTIONS "\$Opt{'$key'} = ";
+	if (defined $Opt{$key}) {
+	    print OPTIONS "'$Opt{$key}';\n"
+	} else {
+	    print OPTIONS "undef;\n"
+	}
+    }
+    foreach my $key (keys %File) {
+	print OPTIONS "\$File{'$key'} = '$File{$key}';\n";
+	print OPTIONS "\$Str{'$key'} = '$Str{$key}';\n";
+    }
+    close OPTIONS;
+}
+
+# 前回起動時のオプション設定を読み込む。: ./.imgs2html.options
+sub read_options() {
+    return if not -r ".imgs2html.options"; # ファイルが無い場合は何もしない。
+
+    open(OPTIONS, ".imgs2html.options") || die "open error: $!";
+    my @tmp = <OPTIONS>;
+    close OPTIONS;
+    my $options = join('', @tmp);
+    eval $options;
+    warn $@ if $@; # エラーの場合
 }
 
 # サムネイル画像をつくる。
@@ -290,7 +332,7 @@ sub make_htmlfiles(@) {
     my (@files) = @_;
 
     my $style_tag = '';
-    $style_tag = "<link rel=\"stylesheet\" href=\"$Stylesheet\" type=\"text/css\">" if defined $Stylesheet;
+    $style_tag = "<link rel=\"stylesheet\" href=\"$Stylesheet\" type=\"text/css\">" if length $Stylesheet;
 
     # HTMLのヘッダ部分
     my $HTML_Header = <<_EndOfHTML_;

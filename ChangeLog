@@ -1,3 +1,8 @@
+2002-10-09  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (save_options, read_options): --interactive 時の設
+	定を保存して次回も使うようなしくみを用意した。
+
 2002-07-11  Masao Takaku  <masao@ulis.ac.jp>
 
 	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.2.1 に上げた。
