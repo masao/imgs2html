@@ -1,5 +1,7 @@
 2003-01-14  Masao Takaku  <masao@ulis.ac.jp>
 
+	* configure.in: imgs2html-0.3.3 をリリース。
+
 	* imgs2html.in: Copyright の年表示を 2003 に。
 
 	* ps2imgs.in: 同上。
