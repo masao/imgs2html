@@ -1,3 +1,8 @@
+[0.2.0] (2002-03-26)
+	* (imgs2html) 画像のサイズ判定に ImageMagick の代わりに
+	Image::Size モジュールを使うようにした。
+	* (configure) Image::Size のチェックを追加。
+
 [0.1.0] (2002-03-26)
 	* (imgs2html) --interactive オプションを追加した。
 	* (imgs2html) --unit-str オプションを追加した。

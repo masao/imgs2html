@@ -1,3 +1,23 @@
+2002-07-09  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.2.0 に上げた。
+
+	* NEWS: バージョン 0.2.0 についての記述を追加。
+
+	* configure.in: Image::Size のチェックを追加した。
+
+	* INSTALL: Image::Size についての記述を追加した。
+	ImageMagick の参照URLを変更した。
+
+	* TODO: Image::Size についての記述を削除した。
+	サイトナビゲーション用の link 要素についての記述を追加した。
+
+	* imgs2html.in (get_img_tag): 画像サイズの判定を identify コマンド
+	の代わりに、Image::Size モジュールを使うよう修正した。（identify
+	コマンドの出力が変更されたようなので…）
+
+	* imgs2html.in: サブルーチンを  "sub foo() {" の形式に統一。
+
 2002-03-26  Masao Takaku  <masao@ulis.ac.jp>
 
 	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.1.0 に上げた。

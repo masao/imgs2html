@@ -9,15 +9,15 @@
 	以下から入手できます。
 	http://www.perl.com/
 
-	また、Perl5のモジュールPod::Usageを利用していますので、これも
-	インストールしておいてください。（Perl version 5.6.0からは標準
-	モジュールに含まれています）
-	Pod::Usage は PodParser-X.XX.tar.gz に含まれています。（CPAN
-	<http://cpan.perl.com/> などから入手できます）
+	また、Perl5のモジュールImage::Size、Pod::Usageを利用しています
+	ので、これもインストールしておいてください。
+	（なお、Pod::Usageは、Perl version 5.6.0からは標準モジュール
+	に含まれています）
+	CPAN <http://www.cpan.org/> などから入手できます。
 
   ・ImageMagick
 	以下から入手できます。
-	http://www.wizards.dupont.com/cristy/ImageMagick.html
+	http://www.imagemagick.org/
 
 
   ・nkf (Network Kanji Filter)

@@ -5,7 +5,7 @@ dnl $Id$
 dnl
 
 AC_INIT(imgs2html.in)
-AM_INIT_AUTOMAKE(imgs2html, 0.1.0)
+AM_INIT_AUTOMAKE(imgs2html, 0.2.0)
 
 dnl Checks for programs.
 
@@ -23,9 +23,8 @@ fi
 dnl Check for ImageMagick commands.
 
 AC_PATH_PROG(CONVERT, convert, no)
-AC_PATH_PROG(IDENTIFY, identify, no)
 
-if test "$CONVERT" = "no" || test "$IDENTIFY" = "no"; then
+if test "$CONVERT" = "no"; then
     AC_MSG_ERROR([
 *** ImageMagick is required.
 *** available from <http://www.wizards.dupont.com/cristy/ImageMagick.html>])
@@ -55,6 +54,17 @@ if test "$PERL" = "no"; then
 *** available from <http://www.perl.com/>])
 fi
 
+AC_MSG_CHECKING(for Image::Size perl module)
+if $PERL -MImage::Size -e "" > /dev/null 2>&1; then
+    AC_MSG_RESULT(yes)
+    image_size=yes
+else
+    AC_MSG_RESULT(no)
+    AC_MSG_ERROR([
+*** the Image::Size perl module is required.
+*** available from <http://search.cpan.org/search?dist=Image-Size>).])
+fi
+
 AC_MSG_CHECKING(for Pod::Usage perl module)
 if $PERL -MPod::Usage -e "" > /dev/null 2>&1; then
     AC_MSG_RESULT(yes)
@@ -63,8 +73,8 @@ else
     AC_MSG_RESULT(no)
     AC_MSG_ERROR([
 *** the Pod::Usage perl module is required.
-*** Pod::Usage is included in PodParser-X.XX.tar.gz (available from 
-*** CPAN <http://cpan.perl.com/>).
+*** Pod::Usage is included in PodParser-X.XX.tar.gz
+*** available from <http://search.cpan.org/search?dist=PodParser>.
 *** (Perl 5.6.0 or later includes Pod::Usage as a standard module)])
 fi
 
