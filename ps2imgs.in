@@ -3,8 +3,8 @@
 #
 # ps2imgs : PostScript ファイルを 画像ファイルに変換します。
 # $Id$
-# 
-# Copyright (C) 1998-2000 by Masao Takaku, Yuka Egusa.
+#
+# Copyright (C) 1998-2003 by Masao Takaku, Yuka Egusa.
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by

@@ -1,6 +1,12 @@
-2003-01-13  Masao Takaku  <masao@ulis.ac.jp>
+2003-01-14  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in: Copyright の年表示を 2003 に。
+
+	* ps2imgs.in: 同上。
 
 	* NEWS: バージョン 0.3.3 についての記述を追加。
+
+2003-01-13  Masao Takaku  <masao@ulis.ac.jp>
 
 	* imgs2html.in (make_thumbnails): サムネール生成時に Exif などの余
 	計なヘッダ類を削除するようにした。
