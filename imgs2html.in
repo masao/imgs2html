@@ -418,8 +418,6 @@ _EndOfHTML_
 <div align="center"><a href="$HomepageUrl">$Str{'home'}へ</a></div>
 _EndOfHTML_
 
-    my $spacestr = "　　　　";
-
     # ヘッダは画像のボタン
     my $headfirststr = get_img_tag("$IconDir/$File{'first'}", $Str{'first'});
     my $headprevstr = get_img_tag("$IconDir/$File{'prev'}", $Str{'prev'});
@@ -427,7 +425,7 @@ _EndOfHTML_
     my $headlaststr = get_img_tag("$IconDir/$File{'last'}", $Str{'last'});
     my $headindexstr = get_img_tag("$IconDir/$File{'index'}", $Str{'index'});
     my $headhomepagestr = get_img_tag("$IconDir/$File{'home'}", $Str{'home'});
-    my $headspacestr = get_img_tag("$IconDir/space.gif", $spacestr);
+    my $headspacestr = get_img_tag("$IconDir/space.gif", "");
 
     # フッダは文字のみ
     my $footfirststr = $Str{'first'};
@@ -436,7 +434,7 @@ _EndOfHTML_
     my $footlaststr = $Str{'last'};
     my $footindexstr = $Str{'index'};
     my $foothomepagestr = $Str{'home'};
-    my $footspacestr = $spacestr;
+    my $footspacestr = "";
 
     my $page = "1";
     my $lastnum = $#files + 1;
