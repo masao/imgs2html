@@ -1,0 +1,168 @@
+Wed Dec 27 22:06:22 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.9 に上げた。
+
+	* NEWS: バージョン 0.0.8 についての記述を追加。
+
+	* ps2imgs.in (convert): GhostScript の出力ファイル指定を正しいもの
+	に修正。
+
+Tue Dec 12 17:18:18 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (pod): --icon-role-?? オプションについての記述の誤
+	りを訂正。
+
+Mon Dec 11 06:21:14 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.8 に上げた。
+
+	* NEWS: バージョン 0.0.7 についての記述を追加。
+
+	* Makefile.am: バージョンアップ時に pod2man を自動的に実行するよう
+	変更。
+
+	* ps2imgs.in (get_papersize): 用紙サイズの指定を見て、gsに渡すよう
+	にした。
+
+Sat Dec  9 04:25:39 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.7 に上げた。
+
+	* NEWS: バージョン 0.0.6 についての記述を追加。
+
+	* imgs2html.in (pickup_files): imgs2html が作るサムネール画像を対
+	象としないように修正。
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.6 に上げた。
+
+	* NEWS: バージョン 0.0.5 についての記述を追加。
+
+	* imgs2html.in (pod): --logo オプションの記述の間違いを修正。
+
+Sat Nov 11 16:17:46 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in (pod): --help, --version の位置を変更。
+
+	* INSTALL: Pod::UsageがPodParser-X.XX.tar.gzの配布に含まれる旨を追
+	加。
+
+	* configure.in: 同上。
+
+Fri Nov 10 10:42:43 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.5 に上げた。
+
+	* ps2imgs.in: 生成されるファイル名についての記述を追加。
+
+	* imgs2html.in: nkfについての記述を追加。
+
+	* imgs2tml.in: @NKF@を導入。
+
+	* INSTALL: nkfについての記述を追加。
+
+	* configure.in: nkfの有無のチェックを追加。
+
+	* INSTALL: Pod::Usageについての記述を追加。
+
+	* configure.in: Pod::Usageの有無のチェックを追加。
+
+Wed Nov  8 11:45:07 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in (AM_INIT_AUTOMAKE): バージョンを 0.0.4 に上げた。
+
+	* バージョン 0.0.3 をリリース。
+
+	* ps2imgs.in: 出力メッセージを少し変更。
+
+	* ps2imgs.in: --head オプションを廃止。
+
+	* TODO: Test suite
+
+	* imgs2html.in: POD形式での文書化を開始。
+
+	* ps2imgs.in: 同上
+
+	* imgs2html.in: usage()を廃止し、Pod::Usageのpod2usage()を利用する。
+
+	* ps2imgs.in: 同上。
+
+	* Makefile.am: help2man → pod2manに変更。
+
+	* INSTALL: manページの記述を追加。
+
+	* configure.in (AC_OUTPUT): chmod +x imgs2html ps2imgs
+
+	* Makefile.am: update-manターゲットを追加。
+
+	* imgs2html.in (parse_options, usage): help2manの処理に合わせてちょっ
+	と修正。
+
+	* imgs2html.1: 新規追加。
+
+	* ps2imgs.1: 新規追加。
+
+Mon Nov  6 16:06:59 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* configure.in, NEWS, configure.in: VERSION 0.0.3
+
+	* imgs2html.in (pickup_files): ファイル名に数字が含まれないファイ
+	ルも全て対象ファイルとするように変更。
+
+Wed Nov  1 09:06:21 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* TODO: ちょっと追加。
+
+	* imgs2html.in: --version オプションを追加。
+
+Tue Oct 31 10:35:25 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in: --style オプションを追加。
+
+	* imgs2html.in: USER 環境変数によってホームページアドレスを推定す
+	るようにした。
+
+Mon Oct 30 11:14:56 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html: オプションを追加。(--icon-first-file=FILE,
+	--icon-home-file=FILE, --icon-index-file=FILE,
+	--icon-last-file=FILE, --icon-logo-file=FILE,
+	--icon-next-file=FILE, --icon-prev-file=FILE, --nav-first-str=STR, 
+	--nav-home-str=STR, --nav-index-str=STR, --nav-last-str=STR,
+	--nav-logo-str=STR, --nav-next-str=STR, --nav-prev-str=STR)
+
+	* imgs2html (make_htmlfiles): バージョンと作成日の情報をHTMLのコメ
+	ントに埋め込むようにした。
+
+Mon Oct 23 02:49:48 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* Makefile.am: (extra_DIST) TODOを追加。
+
+	* TODO: 新規追加。
+
+	* imgs2html.in: (parse_options) --icon-dir=DIR オプションを追加。
+
+	* configure.in: Perl, ImageMagick, Ghostscript が見つからない時は
+	エラーを表示して終了するようにした。
+
+	* ps2imgs.html.in (ppmtoimgs): mogrifyをconvertへ変更。
+	(get_pages): "%%Pages: (attend)"のページ数取得に対応。
+	(ppmtoimgs): 進捗状況を表示。
+
+	* imgs2html.in: Copyright表示を追加。
+	
+	* ps2imgs.in: 同上。
+
+Sun Oct 22 02:02:00 2000  Masao Takaku  <masao@ulis.ac.jp>
+
+	* imgs2html.in: WWW_HOME環境変数を見るように変更。
+	LA研究会依存の記述を削除。
+
+	* INSTALL, Makefile.am: 関係ない記述を消した。
+
+2000-10-22  Masao Takaku  <masao@ulis.ac.jp>
+
+	* autoconf, automake を導入。
+	* とりあえず文書を整備。
+	* CVSで管理を開始。
+
+## $Id$

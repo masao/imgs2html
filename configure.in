@@ -1,0 +1,79 @@
+dnl Process this file with autoconf to produce a configure script.
+dnl
+dnl configure for imgs2html package.
+dnl $Id$
+dnl
+
+AC_INIT(imgs2html.in)
+AM_INIT_AUTOMAKE(imgs2html, 0.0.9)
+
+dnl Checks for programs.
+
+AC_PROG_INSTALL
+
+dnl Check for nkf
+
+AC_PATH_PROG(NKF, nkf, no)
+if test "$NKF" = "no"; then
+    AC_MSG_ERROR([
+*** NKF (Network Kanji Filter) is required.
+*** available <from ftp://ftp.ie.u-ryukyu.ac.jp/pub/software/kono/>])
+fi
+
+dnl Check for ImageMagick commands.
+
+AC_PATH_PROG(CONVERT, convert, no)
+AC_PATH_PROG(IDENTIFY, identify, no)
+
+if test "$CONVERT" = "no" || test "$IDENTIFY" = "no"; then
+    AC_MSG_ERROR([
+*** ImageMagick is required.
+*** available from <http://www.wizards.dupont.com/cristy/ImageMagick.html>])
+fi
+
+dnl Check for Alladin GhostScript.
+
+AC_PATH_PROG(GS, gs, no)
+
+if test "$GS" = "no"; then
+    AC_MSG_ERROR([
+*** Ghostscript is required.
+*** available from <http://www.cs.wisc.edu/~ghost/>])
+fi
+
+AC_ARG_WITH(
+    perl5,
+    [  --with-perl5=PATH       set perl5 location [search path]],
+    AC_MSG_RESULT(using $with_perl5 for perl5)
+    PERL=$with_perl5,
+    [AC_PATH_PROGS(PERL, perl5 perl, no)]
+)
+
+if test "$PERL" = "no"; then
+    AC_MSG_ERROR([
+*** Perl5 is required.
+*** available from <http://www.perl.com/>])
+fi
+
+AC_MSG_CHECKING(for Pod::Usage perl module)
+if $PERL -MPod::Usage -e "" > /dev/null 2>&1; then
+    AC_MSG_RESULT(yes)
+    pod_usage=yes
+else
+    AC_MSG_RESULT(no)
+    AC_MSG_ERROR([
+*** the Pod::Usage perl module is required.
+*** Pod::Usage is included in PodParser-X.XX.tar.gz (available from 
+*** CPAN <http://cpan.perl.com/>).
+*** (Perl 5.6.0 or later includes Pod::Usage as a standard module)])
+fi
+
+dnl Substitutions
+
+AC_SUBST(NKF)
+AC_SUBST(IDENTIFY)
+AC_SUBST(CONVERT)
+AC_SUBST(GS)
+AC_SUBST(PERL)
+
+AC_OUTPUT(Makefile imgs2html ps2imgs, [chmod +x imgs2html ps2imgs])

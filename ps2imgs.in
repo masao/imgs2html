@@ -1,0 +1,181 @@
+#!@PERL@ -w
+# -*- Perl -*-
+#
+# ps2imgs : PostScript ファイルを 画像ファイルに変換します。
+# $Id$
+# 
+# Copyright (C) 1998-2000 by Masao Takaku, Yuka Egusa.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# This file must be encoded in EUC-JP encoding.
+#
+=pod
+
+=head1 NAME
+
+ps2imgs - generate images files from PostScript file
+
+=head1 SYNOPSIS
+
+ps2imgs [B<--help>] [B<--format>=FORMAT] file.ps ...
+
+=head1 DESCRIPTION
+
+ps2imgs は、PostScriptファイルを画像ファイルに変換します。
+
+生成する画像のファイル名は、PostScriptファイルの拡張子を除いた部分＋3
+桁の連番が自動的にふられます。例えば、ex.psというファイルを変換すると、
+ex001.gif, ex002.gif, ...のようなファイルが生成されます。
+
+=head1 OPTIONS
+
+以下のオプションを指定できます。
+
+=over 4
+
+=item B<--format=FORMAT>
+
+生成する画像ファイルの形式を指定します。
+（デフォルトは gif です）
+
+=item B<--help>
+
+このへルプを表示します。
+
+=back
+
+=head1 PREREQUISITES
+
+このスクリプトは、PostScriptの処理にGhostscriptを、画像の処理に
+ImageMagickを利用しています。
+
+=head1 COREQUISITES
+
+生成した画像は、B<imgs2html>を使うとWWWですぐに公開できます。
+
+=head1 AUTHOR
+
+高久 雅生 <masao@ulis.ac.jp>, 江草 由佳 <yuka@ulis.ac.jp>
+
+=cut
+
+use File::Basename;
+use Getopt::Long;
+use Pod::Usage;
+
+use strict;
+$| = 1;
+
+# 大域変数
+my $Format = "gif";	# 拡張子
+my $DEFAULT_PAPERSIZE = 'a4';
+
+main();
+sub main {
+    my @files = parse_options();
+    foreach my $ps_file (@files) {
+	if (! -f $ps_file) {
+	    print "入力ファイル(`$ps_file')が見つかりません。\n";
+	    print "無視します。\n";
+	}
+	convert($ps_file);
+    }
+}
+
+sub convert($) {
+    my ($file) = @_;
+
+    print "($file)\n";
+
+    my $base = basename($file, '.ps');
+
+    my $pages = get_pages($file);
+    my $papersize = get_papersize($file);
+    $papersize = $DEFAULT_PAPERSIZE if (!defined $papersize);
+
+    print "PostScriptファイルをppm形式に変換します。少し時間がかかります。\n";
+    open(GS, "|@GS@ -q -dNOPAUSE -sDEVICE=ppmraw -sPAPERSIZE=$papersize -dTextAlphaBits=4 -dGraphicsAlphaBits=4 -sOutputFile=$base%03d.ppm > /dev/null") ||
+	die "GhostScriptが実行できません。: $!";
+    print GS "($file) run\n";
+    print GS "quit\n";
+    close(GS) || die "GhostScriptが実行できません。: $!";
+
+    my @created = glob("$base???.ppm");
+    my $created_pages = $#created + 1;
+    if ($pages != $created_pages) {
+	print "WARNING: 変換されたページ数: $created_pages ($pagesページ中)\n";
+	print "WARNING: 変換は失敗した可能性があります。\n";
+	print "WARNING: ". ($created_pages + 1) .
+	    "ページ目が不正なPostScriptコードを含んでいる可能性があります。\n";
+    }
+    print "ppm を $Format に変換します。\n";
+    my @ppms = glob("$base???.ppm");
+    foreach my $ppm (@ppms) {
+	print "*";
+	my $ppmbase = basename($ppm, ".ppm");
+	system "@CONVERT@ $ppm $ppmbase.$Format 2>&1"
+	    || die "convertが実行できませんでした。: $!";
+	unlink $ppm;
+    }
+    print " 完了\n";
+}
+
+sub parse_options() {
+    my $opt_help = undef;
+    my $opt_version = undef;
+    
+    Getopt::Long::config('bundling');
+    GetOptions ('h|help'              => \$opt_help,
+                'format=s'            => \$Format,
+		) || pod2usage(1);
+
+    pod2usage(-exitval=>0, -verbose=>1) if (defined $opt_help);
+    pod2usage(1) if (@ARGV == 0);
+    return @ARGV;
+}
+
+sub get_papersize($) {
+    my ($file) = @_;
+    open(FILE, "$file") || die "open fail: $file: $!";
+    while (my $line = <FILE>) {
+	if ($line =~ /^%%DocumentPaperSizes:\s*(\S+)/) {
+	    return lc($1);
+	}
+    }
+    return undef;
+}
+
+sub get_pages($) {
+    my ($file) = @_;
+
+    open(FILE, "$file") || die "入力ファイル(`$file')が開けません。: $!";
+    my @lines = <FILE>;
+    close(FILE);
+    while (my $line = shift @lines) {
+	if ($line =~ /^%%Pages:\s*(.*)$/) {
+	    my $page = $1;
+	    if ($page =~ /(atend)/) {
+		@lines = reverse @lines;
+		next;
+	    }
+	    $page =~ s/\r$//;
+	    print "総ページ数: $page ページ\n";
+	    return $page;
+	}
+    }
+    print "総ページ数: 不明\n";
+    return 0;
+}

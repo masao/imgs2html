@@ -1,0 +1,541 @@
+#!@PERL@ -w
+# -*-Perl-*-
+#
+# imgs2html : 複数の画像ファイルを元にHTMLファイルを自動的に作成します。
+# $Id$
+#
+# Copyright (C) 1998-2000 by Masao Takaku, Yuka Egusa.
+#
+#  This program is free software; you can redistribute it and/or modify
+#  it under the terms of the GNU General Public License as published by
+#  the Free Software Foundation; either version 2 of the License, or
+#  (at your option) any later version.
+#
+#  This program is distributed in the hope that it will be useful,
+#  but WITHOUT ANY WARRANTY; without even the implied warranty of
+#  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#  GNU General Public License for more details.
+#
+#  You should have received a copy of the GNU General Public License
+#  along with this program; if not, write to the Free Software
+#  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+#
+# This file must be encoded in EUC-JP encoding.
+#
+=pod
+
+=head1 NAME
+
+imgs2html - generate HTML files from images files
+
+=head1 SYNOPSIS
+
+imgs2html [B<--suffix>=SUFFIX] [B<--thumbnail-ratio>=SIZE]
+[B<--homepage-url>=URL] [B<--icon-dir>=DIR] [B<--style>=URL]
+[B<--icon-I<role>-file>=FILE] [B<--nav-I<role>-str>=STR] [B<--logo>]
+[B<--notitle>] [B<--version>] [B<--help>]
+
+=head1 DESCRIPTION
+
+imgs2htmlは複数の画像ファイルを元にHTMLファイルを作成します。
+
+このスクリプトを実行するとカレントディレクトリにある画像ファイルを探し、
+それらの一覧と各画像からなるHTMLファイル群を生成します。
+
+生成されるHTMLファイルの文字コードはISO-2022-JPです。
+
+=head1 OPTIONS
+
+以下のオプションを指定できます。
+
+=over 4
+
+=item B<-s>, B<--suffix=SUFFIX>
+
+対象とする画像の拡張子を指定します。
+（デフォルトは gif です）
+
+=item B<-r>, B<--thumbnail-ratio=SIZE>
+
+サムネール画像の元画像からの比率を指定します。
+（デフォルトは 15% です）
+
+=item B<-u>, B<--homepage-url=URL>
+
+ホームのURLを指定します。
+（デフォルトは ../ を指します。）
+
+=item B<--icon-dir=DIR>
+
+ナビゲーション・アイコンのディレクトリ
+（デフォルトは ../image/ です）
+
+=item B<--style=URL>
+
+HTMLファイルで利用するスタイルシートのURLを指定します。
+（デフォルトではスタイルシートは使いません）
+
+=item B<--logo>
+
+ロゴを表示します。
+（デフォルトでは表示しません）
+
+=item B<--notitle>
+
+タイトル（○枚目）を表示しません。
+（デフォルトでは表示します）
+
+=item (ナビゲーションバーの設定)
+
+ナビゲーションバーの部分のアイコンや文字列などを変更するには、以下のオ
+プションが利用できます。
+
+I<role>の部分にはそれぞれ、
+B<first>,
+B<prev>, 
+B<next>,
+B<last>,
+B<logo>, 
+B<index>,
+B<home>
+のいずれかが入ります。
+
+=over 4
+
+=item B<--icon->I<role>B<-file=FILE>
+
+ナビゲーションバーの各位置のアイコンのファイル名を指定します。
+（ファイルが存在しない場合はアイコンは表示しません）
+
+=item B<--nav->I<role>B<-str=STR>
+
+ナビゲーションバーの各位置の説明文字列を設定します。
+
+デフォルトの設定は以下の通り：
+
+=over 4
+
+=item B<--icon-first-file>	first.gif
+
+=item B<--icon-prev-file>	prev.gif
+
+=item B<--icon-next-file>	next.gif
+
+=item B<--icon-last-file>	last.gif
+
+=item B<--icon-home-file>	home.gif
+
+=item B<--icon-index-file>	info.gif
+
+=item B<--icon-logo-file>	logo.gif
+
+=item B<--nav-first-str>	最初のページ
+
+=item B<--nav-prev-str>		前のページ
+
+=item B<--nav-next-str>		次のページ
+
+=item B<--nav-last-str>		最後のページ
+
+=item B<--nav-home-str>		ホームページ
+
+=item B<--nav-index-str>	一覧
+
+=item B<--nav-logo-str>		ロゴ
+
+=back
+
+=back
+
+=item B<--version>
+
+バージョンを表示します。
+
+=item B<-h>, B<--help>
+
+このヘルプを表示します。
+
+=back
+
+=head1 PREREQUISITES
+
+このスクリプトは、画像の処理にImageMagickを利用します。
+また、日本語のコード変換にnkfを利用します。
+
+=head1 COREQUISITES
+
+B<ps2imgs>スクリプトと一緒に使うと効果的かもしれませんね。
+
+=head1 AUTHOR
+
+高久 雅生 <masao@ulis.ac.jp>, 江草 由佳 <yuka@ulis.ac.jp>
+
+=cut
+
+use Getopt::Long;
+use Pod::Usage;
+
+use strict;
+
+$| = 1;
+
+#### 大域変数:
+# バージョン番号
+my $VERSION = "@VERSION@";
+
+# デバッグ用
+my $DEBUG = undef;
+
+# ホームページの情報
+my $HomepageUrl = "../";
+$HomepageUrl = "/~$ENV{'USER'}/" if defined $ENV{'USER'};
+$HomepageUrl = $ENV{'WWW_HOME'} if defined $ENV{'WWW_HOME'};
+
+# 対象となる画像ファイルの拡張子: -s オプションで指定可能。
+my $Suffix = "gif";
+
+# アイコンファイルの入っているディレクトリ
+my $IconDir = "../image";
+
+# ページ or スライド ？
+my $UnitStr="枚";
+
+# サムネールのサイズ（オリジナルの画像に対するパーセンテージ）
+my $ThumbnailRatio = "15%";
+
+# ナビゲーションバーで使うファイルとアンカー。(オプション設定可)
+my %File = ();
+$File{'first'} = "first.gif";
+$File{'prev'} = "prev.gif";
+$File{'next'} = "next.gif";
+$File{'last'} = "last.gif";
+$File{'index'} = "info.gif";
+$File{'home'} = "home.gif";
+$File{'logo'} = "logo.gif";
+
+my %Str = ();
+$Str{'first'} = "最初のページ";
+$Str{'prev'} = "前のページ";
+$Str{'next'} = "次のページ";
+$Str{'last'} = "最後のページ";
+$Str{'index'} = "一覧";
+$Str{'home'} = "ホームページ";
+$Str{'logo'} = "ロゴ";
+
+# (オプション設定用)
+my %Opt = ();
+
+# ロゴを表示するか？
+$Opt{'logo'} = undef;
+
+# タイトルを表示するか？
+$Opt{'title'} = undef;
+
+# スタイルシートのURI
+my $Stylesheet = undef;
+
+main();
+sub main {
+    parse_options();
+
+    print "対象ファイルを探索します。... ";
+    my @files = pickup_files();
+    if ($#files >= 1) {
+	print $#files+1 ." ファイル見つけました。\n";
+    } else {
+	print "対象となる画像ファイルがありません。\n";
+	exit 0;
+    }
+
+    print "一覧用のサムネイル画像を作成します。\n";
+    make_thumbnails(@files);
+    
+    print "HTMLファイルを作成します。\n";
+    make_htmlfiles(@files);
+    print "カレントディレクトリにHTMLファイルを作成しました。\n"
+}
+
+# 画像のタグ入り文字列作成  引数 ファイル名 と alt 文字列
+sub get_img_tag($$)
+{
+    my ($imagefile, $altstr) = @_;
+
+    return $altstr if ! -f $imagefile;
+    
+    my $imagewidth ="";
+    my $imageheight ="";
+    
+    open(ID, "@IDENTIFY@ $imagefile|") || die "identifyが実行できませんでした。:$!";
+    my $id = <ID>;
+    if ($id =~ /^$imagefile (\d+)x(\d+)/) {
+        $imagewidth = $1;
+        $imageheight = $2;
+    }
+    close(ID) || die "identifyが実行できませんでした。:$!";
+
+    my $imagetagstr = "<img src=\"$imagefile\" alt=\"$altstr\" width=\"$imagewidth\" height=\"$imageheight\">";
+	
+    return $imagetagstr;
+}
+
+# オプションを解析する。
+sub parse_options()
+{
+    my $opt_help = undef;
+    my $opt_version = undef;
+    
+    Getopt::Long::config('bundling');
+    GetOptions ('h|help'              => \$opt_help,
+		'd|debug'             => \$DEBUG,
+		'version'	      => \$opt_version,
+		's|suffix=s'          => \$Suffix,
+		'r|thumbnail-ratio=s' => \$ThumbnailRatio,
+		'u|homepage-url=s'    => \$HomepageUrl,
+		'style=s'	      => \$Stylesheet,
+		'icon-dir=s'          => \$IconDir,
+		'icon-first-file=s'   => \$File{'first'},
+		'icon-prev-file=s'    => \$File{'prev'},
+		'icon-next-file=s'    => \$File{'next'},
+		'icon-last-file=s'    => \$File{'last'},
+		'icon-index-file=s'   => \$File{'index'},
+		'icon-home-file=s'    => \$File{'home'},
+		'icon-logo-file=s'    => \$File{'logo'},
+		'nav-first-str=s'     => \$Str{'first'},
+		'nav-prev-str=s'      => \$Str{'prev'},
+		'nav-next-str=s'      => \$Str{'next'},
+		'nav-last-str=s'      => \$Str{'last'},
+		'nav-index-str=s'     => \$Str{'index'},
+		'nav-home-str=s'      => \$Str{'home'},
+		'nav-logo-str=s'      => \$Str{'logo'},
+		'logo!'               => \$Opt{'logo'},
+		'title!'              => \$Opt{'title'}
+		) || pod2usage(-exitval=>1, -verbose=>0);
+
+    pod2usage(-exitval => 0, -verbose => 1)
+	if ($opt_help);
+    
+    if ($opt_version) {
+	print "imgs2html $VERSION\n";
+    }
+    
+    if (@ARGV != 0) {
+	print "以下の引数は無効です: @ARGV\n";
+    }
+    
+    if ($DEBUG) {
+	print "オプションの設定は以下の通りです。";
+	foreach my $key (keys %Opt) {
+	    print "  $key => $Opt{$key}\n";
+	}
+    }
+}
+
+# サムネイル画像をつくる。
+sub make_thumbnails(@)
+{
+    my (@files) = @_;
+    my $percentage = $ThumbnailRatio ."x". $ThumbnailRatio;
+    foreach my $file (@files) {
+	print "*";
+	my $smallfile = small_filename($file);
+	die "convertが実行できませんでした。:"
+	    if system "@CONVERT@ -geometry $percentage $file $smallfile 2>&1";
+    }
+    print " 完了\n";
+}
+
+sub small_filename($)
+{
+    my ($filename) = @_;
+    my $small_filename = $filename;
+    $small_filename =~ s/(.*)\.$Suffix$/$1small\.$Suffix/;
+    return $small_filename;
+}
+sub html_filename($)
+{
+    my ($filename) = @_;
+    my $html_filename = $filename;
+    $html_filename =~ s/(.*)\.$Suffix/$1\.html/;
+    return $html_filename;
+}
+
+# 対象となるファイルを探索し、ファイル名でソートしたリストを返す。
+sub pickup_files()
+{
+    opendir(DIR, ".") || die "読めません: $!";
+    my @files = grep { -f && /\.$Suffix$/ } readdir(DIR);
+
+    # imgs2html が作るサムネール画像は対象からはずす。
+    @files = grep {! /small\.$Suffix$/} @files;
+    closedir(DIR);
+
+    return sort fncmp @files;
+}
+
+sub make_htmlfiles(@) {
+    my (@files) = @_;
+
+    # ロゴの情報
+    my $logostr = get_img_tag("$IconDir/$File{'logo'}", $Str{'logo'})
+	if $Opt{'logo'};
+
+    my $style_tag = '';
+    $style_tag = "<link rel=\"stylesheet\" href=\"$Stylesheet\" type=\"text/css\">" if defined $Stylesheet;
+
+    # HTMLのヘッダ部分    
+    my $HTML_Header = <<_EndOfHTML_;
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html lang="ja">
+<head>
+<meta http-equiv="Content-type" content="text/html; charset=ISO-2022-JP">
+$style_tag
+<title>DUMMY TITLE (Automatically replacing)</title>
+</head>
+<body>
+_EndOfHTML_
+
+    my $date = localtime();
+    # HTML の フッタ部分
+    my $HTML_Footer = <<_EndOfHTML_;
+<!-- Converted by imgs2html-$VERSION at $date -->
+</body>
+</html>
+_EndOfHTML_
+
+    # index.html のフッダ部分
+    my $indexfooter = <<_EndOfHTML_;
+</div>
+<hr width="50%">
+<div align="center"><a href="$HomepageUrl">$Str{'home'}へ</a></div>
+_EndOfHTML_
+
+    my $spacestr = "　　　　";
+
+    # ヘッダは画像のボタン
+    my $headfirststr = get_img_tag("$IconDir/$File{'first'}", $Str{'first'});
+    my $headprevstr = get_img_tag("$IconDir/$File{'prev'}", $Str{'prev'});
+    my $headnextstr = get_img_tag("$IconDir/$File{'next'}", $Str{'next'});
+    my $headlaststr = get_img_tag("$IconDir/$File{'last'}", $Str{'last'});
+    my $headindexstr = get_img_tag("$IconDir/$File{'index'}", $Str{'index'});
+    my $headhomepagestr = get_img_tag("$IconDir/$File{'home'}", $Str{'home'});
+    my $headspacestr = get_img_tag("$IconDir/space.gif", $spacestr);
+
+    # フッダは文字のみ
+    my $footfirststr = $Str{'first'};
+    my $footprevstr = $Str{'prev'};
+    my $footnextstr = $Str{'next'};
+    my $footlaststr = $Str{'last'};
+    my $footindexstr = $Str{'index'};
+    my $foothomepagestr = $Str{'home'};
+    my $footspacestr = $spacestr;
+
+    my $page = "1";
+    my $lastnum = $#files + 1;
+    my $firstfile = html_filename($files[0]);
+    my $lastfile = html_filename($files[$#files]);
+
+    open(INDEXHTML, "|@NKF@ > index.html") || die "error: $!";
+    $HTML_Header =~ s#<title>(.*)</title>#<title>一覧</title>#g;
+    print INDEXHTML $HTML_Header;
+    print INDEXHTML "<h1 align=\"center\">一覧 (全$lastnum${UnitStr})</h1>\n";
+    print INDEXHTML "<div align=\"center\"><a href=\"$firstfile\">一${UnitStr}目へ</a></div>\n";
+    print INDEXHTML "<hr width=\"50%\">\n";
+    print INDEXHTML "<div align=\"center\">\n";
+
+    foreach my $file (@files) {
+	print "*";
+	my $smallfile = small_filename($file);
+	my $htmlfile = html_filename($file);
+	
+	my $dumpstr = get_img_tag($smallfile, "page $page");
+        print INDEXHTML "<a href=\"$htmlfile\">$dumpstr</a>\n";
+
+	open(HTML, "|@NKF@ > $htmlfile") || die "error: $!";
+
+        my $prevfile = html_filename($files[$page-2])
+	    if defined($files[$page-2]);
+        my $nextfile = html_filename($files[$page]) if defined($files[$page]);
+	
+        my $saisho="";
+        my $modoru="";
+        my $tugi="";
+        my $saigo="";
+	
+	if($page == 1){
+	    # はじめのページ
+	    $saisho=$headfirststr;
+	    $modoru=$headprevstr;
+	    $tugi="<a href=\"$nextfile\">$headnextstr</a>";
+	    $saigo="<a href=\"$lastfile\">$headlaststr</a>";
+	} elsif ($page == $lastnum){
+	    # 最後のページ
+	    $saisho="<a href=\"$firstfile\">$headfirststr</a>";
+	    $modoru="<a href=\"$prevfile\">$headprevstr</a>";
+	    $tugi=$headnextstr;
+	    $saigo=$headlaststr;
+	} else {
+	    # ふつうのページ
+	    $saisho="<a href=\"$firstfile\">$headfirststr</a>";
+	    $modoru="<a href=\"$prevfile\">$headprevstr</a>";
+	    $tugi="<a href=\"$nextfile\">$headnextstr</a>";
+	    $saigo="<a href=\"$lastfile\">$headlaststr</a>";	
+	}
+	my $itiran="<a href=\"index.html\">$headindexstr</a>";
+	my $homepage="<a href=\"$HomepageUrl\">$headhomepagestr</a>";
+	my $space=$headspacestr;
+
+	# ヘッダ
+        $HTML_Header =~
+	    s#<title>(.*)</title>#<title>${page}${UnitStr}目</title>#g; 
+        print HTML $HTML_Header;
+        print HTML "<h1 align=\"center\">${page}${UnitStr}目</h1>\n"
+	    if $Opt{'title'};
+        print HTML "<div align=\"center\">\n";
+        print HTML " $saisho \n $modoru \n $tugi \n $saigo \n  $space \n ";
+        print HTML " $itiran \n $homepage\n $space \n";
+	print HTML "$logostr\n" if $Opt{'logo'};
+	print HTML "</div>\n";
+	
+	# 画像取り込み
+	$dumpstr = get_img_tag($file, "$page page");
+        print HTML "<div align=\"center\">\n$dumpstr\n</div>\n";
+
+	# フッダ
+        $saisho=~ s#$headfirststr#$footfirststr#g;
+        $modoru=~ s#$headprevstr#$footprevstr#g;
+        $tugi=~ s#$headnextstr#$footnextstr#g;
+        $saigo=~ s#$headlaststr#$footlaststr#g;     
+        $itiran=~ s#$headindexstr#$footindexstr#g;	
+        $homepage=~ s#$headhomepagestr#$foothomepagestr#g;
+	$space=~ s#$headspacestr#$footspacestr#g;
+	print HTML "<div align=\"center\">\n";
+	print HTML " $saisho \n $modoru \n $tugi \n $saigo \n  $space \n ";
+        print HTML " $itiran \n $homepage\n $space \n ";
+	print HTML "</div>\n";
+	print HTML $HTML_Footer;
+	
+	close HTML;
+	$page++;
+    }
+    print INDEXHTML $indexfooter;
+    print INDEXHTML "<div align=\"right\">$logostr</div>" if $Opt{'logo'};
+    print INDEXHTML $HTML_Footer;
+    print " 完了\n";
+}
+
+## このサブルーチンは全文検索エンジン Namazu に由来します。
+# Copyright (C) 1997-1999 Satoru Takabayashi All rights reserved.
+# ファイル名を数字を考慮してソートする
+# このコードはは古川@ヤマハさんに頂きました
+sub fncmp {
+    my ($x, $y) = ($a, $b);
+    # ファイル名のソートを数値も考慮して行なう
+    # 普通にやると、1, 10, 2, 3, ... の順になってしまう。
+    # ちゃんとやる方法もあるが、面倒なので、
+    # ケタ数を適当に制限して安易に実装。
+    # ファイル名に 8 ケタより長い数字が無ければ大丈夫。
+
+    $x =~ s/(\d+)/sprintf("%08d", $1)/ge;
+    $y =~ s/(\d+)/sprintf("%08d", $1)/ge;
+    $x cmp $y;
+}
