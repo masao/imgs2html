@@ -355,7 +355,7 @@ sub save_comment(%) {
     my $savefile = ".comment";
     rename($savefile, "$savefile.bak") || die "error: $!" if -f $savefile;
     open(COMMENT, ">$savefile") || die "error: $!";
-    foreach my $key (keys %comment) {
+    foreach my $key (sort fncmp keys %comment) {
 	print COMMENT "$key/";
 	if (defined $comment{$key}) {
 	    print COMMENT $comment{$key};
