@@ -188,6 +188,7 @@ B<ps2imgs>スクリプトと一緒に使うと効果的かもしれませんね。
 
 use Getopt::Long;
 use Pod::Usage;
+use Image::Size qw(html_imgsize);
 
 use strict;
 
@@ -281,20 +282,9 @@ sub get_img_tag($$)
 
     return $altstr if ! -f $imagefile;
 
-    my $imagewidth ="";
-    my $imageheight ="";
+    my $size = html_imgsize($imagefile);
 
-    open(ID, "@IDENTIFY@ $imagefile|") || die "identifyが実行できませんでした。:$!";
-    my $id = <ID>;
-    if ($id =~ /^$imagefile (\d+)x(\d+)/) {
-        $imagewidth = $1;
-        $imageheight = $2;
-    }
-    close(ID) || die "identifyが実行できませんでした。:$!";
-
-    my $imagetagstr = "<img src=\"$imagefile\" alt=\"$altstr\" width=\"$imagewidth\" height=\"$imageheight\">";
-
-    return $imagetagstr;
+    return "<img src=\"$imagefile\" alt=\"$altstr\" $size>";
 }
 
 # オプションを解析する。
@@ -507,7 +497,7 @@ _EndOfHTML_
 	print "*";
 	my $smallfile = small_filename($file);
 	my $htmlfile = html_filename($file);
-	
+
         $htmlfiles{'prev'} = html_filename($files[$page-2])
 	    if defined($files[$page-2]);
         $htmlfiles{'next'} = html_filename($files[$page])
@@ -520,7 +510,7 @@ _EndOfHTML_
 
 	# ヘッダ
         $HTML_Header =~
-	    s#<title>(.*)</title>#<title>${page}${UnitStr}目</title>#g; 
+	    s#<title>(.*)</title>#<title>${page}${UnitStr}目</title>#g;
         print HTML $HTML_Header;
         print HTML "<h1 align=\"center\">${page}${UnitStr}目</h1>\n"
 	    if $Opt{'title'};
@@ -533,7 +523,7 @@ _EndOfHTML_
 	# フッタ
 	print HTML get_navbar_html($page, $lastnum, 1, %htmlfiles);
 	print HTML $HTML_Footer;
-	
+
 	close HTML;
 	$page++;
     }
