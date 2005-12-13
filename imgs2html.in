@@ -189,7 +189,7 @@ sub parse_options() {
     }
 }
 
-sub getoptions_interactive() {
+sub getoptions_interactive {
     print "\n[設定項目]:\n";
     $Suffix = prompt("対象とする画像の拡張子", $Suffix);
     $Opt{'htmlonly'} = not prompt_yn("サムネールを生成する？",
