@@ -303,7 +303,7 @@ sub make_thumbnails(@) {
 	print "*";
 	my $smallfile = small_filename($file);
 	die "convertが実行できませんでした。:"
-	    if system "@CONVERT@ +profile '*' -geometry $percentage $file $smallfile 2>&1";
+	    if system("@CONVERT@", "+profile", '*', "-geometry", $percentage, $file, $smallfile);
     }
     print " 完了\n";
 }
