@@ -164,7 +164,7 @@ sub parse_options() {
 		'htmlonly!'	      => \$Opt{'htmlonly'}
 	       ) || pod2usage(-exitval=>1, -verbose=>0);
 
-    pod2usage(-exitval => 0, -verbose => 1)
+    pod2usage(-exitval => 0, -verbose => 2)
 	if ($opt_help);
 
     if ($opt_version) {
