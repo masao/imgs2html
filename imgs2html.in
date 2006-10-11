@@ -49,7 +49,7 @@ my $Suffix = "gif";
 my $IconDir = "../image";
 
 # ページ or スライド？: （--unit-str オプション）
-my $UnitStr="枚";
+my $UnitStr="枚目";
 
 # サムネールのサイズ（オリジナルの画像に対するパーセンテージ）
 my $ThumbnailRatio = "15%";
@@ -203,7 +203,7 @@ sub getoptions_interactive {
 	unless -d $IconDir;
     $Stylesheet = prompt("スタイルシート（CSS）のURL", $Stylesheet);
     $HomepageUrl = prompt("ホームのURL", $HomepageUrl);
-    $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr目）を表示する？",
+    $Opt{'title'} = prompt_yn("タイトル（〜$UnitStr）を表示する？",
 			      $Opt{'title'});
     $UnitStr = prompt("画像の呼び方（〜枚目）", $UnitStr) if $Opt{'title'};
     $Opt{'logo'} = prompt_yn("ロゴを表示する？", $Opt{'logo'});
@@ -392,7 +392,7 @@ _EndOfHTML_
     my $indexfooter = <<_EndOfHTML_;
 </div>
 <hr width="50%">
-<div align="center"><a href="$HomepageUrl">$Str{'home'}へ</a></div>
+<div align="center"><a href="$HomepageUrl">$Str{'home'}</a></div>
 _EndOfHTML_
 
     my $page = "1";
@@ -403,10 +403,10 @@ _EndOfHTML_
     $htmlfiles{'last'} = html_filename($files[$#files]);
 
     open(INDEXHTML, "|@NKF@ > index.html") || die "error: $!";
-    $HTML_Header =~ s#<title>(.*)</title>#<title>一覧</title>#g;
+    $HTML_Header =~ s#<title>(.*)</title>#<title>$Str{'index'}</title>#g;
     print INDEXHTML $HTML_Header;
-    print INDEXHTML "<h1 align=\"center\">一覧 (全$lastnum${UnitStr})</h1>\n";
-    print INDEXHTML "<div align=\"center\"><a href=\"$htmlfiles{'first'}\">一${UnitStr}目へ</a></div>\n";
+    print INDEXHTML "<h1 align=\"center\">$Str{'index'} ($lastnum)</h1>\n";
+    print INDEXHTML "<div align=\"center\"><a href=\"$htmlfiles{'first'}\">$Str{'first'}</a></div>\n";
     print INDEXHTML "<hr width=\"50%\">\n";
     print INDEXHTML "<div align=\"center\">\n";
 
@@ -430,7 +430,7 @@ _EndOfHTML_
 	open(HTML, "|@NKF@ > $htmlfile") || die "error: $!";
 
 	# ヘッダ
-	my $title = "${page}${UnitStr}目";
+	my $title = "${page} ${UnitStr}";
 	if (not $Opt{'title'}) {
 	    $title = $file;
 	    $title .= ": $comment{$file}" if $comment{$file};
@@ -438,7 +438,7 @@ _EndOfHTML_
 	$HTML_Header =~
 	    s#<title>(.*)</title>#<title>$title</title>#g;
         print HTML $HTML_Header;
-        print HTML "<h1 align=\"center\">${page}${UnitStr}目</h1>\n"
+        print HTML "<h1 align=\"center\">${page} ${UnitStr}</h1>\n"
 	    if $Opt{'title'};
 	print HTML get_navbar_html($page, $lastnum, undef, %htmlfiles);
 
@@ -618,8 +618,8 @@ HTML 出力のみ行い、サムネイルを生成しません。
 
 =item B<--unit-str>=STR
 
-「〜枚目」の出力を変更します。
-（デフォルトでは"枚"）
+「〜枚目」という出力単位を示す表示を変更します。
+（デフォルトでは"枚目"）
 
 =item (ナビゲーションバーの設定)
 
