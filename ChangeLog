@@ -1,3 +1,7 @@
+2006-10-11  Masao Takaku  <masao@nii.ac.jp>
+
+	* imgs2html.in, ps2img.in: pod内の著者アドレスを変更。
+
 2006-09-29  Masao Takaku  <masao@nii.ac.jp>
 
 	* imgs2html.in: --help指定時にオプション以外のヘルプ全てを表示する
