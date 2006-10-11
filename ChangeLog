@@ -1,5 +1,7 @@
 2006-10-11  Masao Takaku  <masao@nii.ac.jp>
 
+	* configure.in: imgs2html-0.4.0 リリース
+
 	* imgs2html.in, ps2img.in: pod内の著者アドレスを変更。
 
 	* imgs2html.in: 「へ」「目」「一覧」などの埋め込み文字列を除去。
